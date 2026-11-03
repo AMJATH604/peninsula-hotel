@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+/* ===== PENINSULA CHENNAI — LUXURY DESIGN SYSTEM ===== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-navy: #0A1628;
+  --color-navy-light: #152238;
+  --color-gold: #C9A96E;
+  --color-gold-light: #D4BC8E;
+  --color-gold-dark: #A8894E;
+  --color-pearl: #FAF7F2;
+  --color-warm-gray: #6B6B6B;
+  --color-warm-gray-light: #9A9A9A;
+  --color-cream: #F5F0E8;
+  --font-heading: var(--font-playfair);
+  --font-body: var(--font-inter);
+}
+
+:root {
+  --background: #FAF7F2;
+  --foreground: #0A1628;
+}
+
+/* ===== GLOBAL STYLES ===== */
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+}
+
+/* ===== LUXURY SCROLLBAR ===== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9A96E;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A8894E;
+}
+
+/* ===== SELECTION ===== */
+
+::selection {
+  background: #C9A96E;
+  color: #FAF7F2;
+}
+
+/* ===== LUXURY ANIMATIONS ===== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes goldPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ===== LUXURY DIVIDER ===== */
+
+.luxury-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C9A96E, transparent);
+  margin: 1rem auto;
+}
+
+.luxury-divider-wide {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C9A96E, transparent);
+  margin: 1.5rem auto;
+}
+
+/* ===== GLASS MORPHISM ===== */
+
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ===== LUXURY BUTTON STYLES ===== */
+
+.btn-gold {
+  background: linear-gradient(135deg, #C9A96E, #D4BC8E);
+  color: #0A1628;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #D4BC8E, #C9A96E);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(201, 169, 110, 0.4);
+}
+
+.btn-outline-gold {
+  border: 1px solid #C9A96E;
+  color: #C9A96E;
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.btn-outline-gold:hover {
+  background: #C9A96E;
+  color: #0A1628;
+}
+
+/* ===== IMAGE OVERLAY ===== */
+
+.image-overlay {
+  position: relative;
+}
+
+.image-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(10, 22, 40, 0.3), rgba(10, 22, 40, 0.7));
+}
+
+/* ===== HERO GRADIENT ===== */
+
+.hero-gradient {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 22, 40, 0.1) 0%,
+    rgba(10, 22, 40, 0.4) 50%,
+    rgba(10, 22, 40, 0.8) 100%
+  );
+}
