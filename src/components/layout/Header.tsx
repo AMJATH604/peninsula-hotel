@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { Phone, Menu, X } from "lucide-react";
 
 const navLinks = [
@@ -19,6 +19,7 @@ const navLinks = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +31,12 @@ export default function Header() {
 
   return (
     <>
+      {/* Luxury Gold Scroll Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#C9A96E] via-[#F3E7D3] to-[#C9A96E] z-[60] origin-left shadow-[0_0_12px_rgba(201,169,110,0.8)]"
+        style={{ scaleX: scrollYProgress }}
+      />
+
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
