@@ -1,9 +1,9 @@
-// ===== PENINSULA CHENNAI — PLACEHOLDER DATA =====
-// All data here will be managed via the Admin Panel later
+// ===== PENINSULA CHENNAI — CURATED LUXURY DATA & EDITORIAL PHOTOGRAPHY =====
+// All data here can be managed & updated via the Admin Panel
 
 import { Room, DiningVenue, SpaService, EventVenue, Testimonial, GalleryImage, Offer, DashboardStats, RevenueData, Booking, Guest } from "@/types";
 
-// ===== ROOMS =====
+// ===== ROOMS & SUITES =====
 export const rooms: Room[] = [
   {
     id: "1",
@@ -19,7 +19,11 @@ export const rooms: Room[] = [
     bedType: "King",
     floor: "3rd - 8th Floor",
     view: "City View",
-    images: ["/images/rooms/deluxe-1.jpg", "/images/rooms/deluxe-2.jpg", "/images/rooms/deluxe-3.jpg"],
+    images: [
+      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80",
+    ],
     amenities: ["Free Wi-Fi", "Rain Shower", "Mini Bar", "Smart TV", "Room Service", "Safe", "Air Conditioning", "Complimentary Water"],
     features: ["City View", "Marble Bathroom", "Egyptian Cotton Linens", "Nespresso Machine", "Pillow Menu"],
     isAvailable: true,
@@ -39,7 +43,11 @@ export const rooms: Room[] = [
     bedType: "King / Twin",
     floor: "5th - 12th Floor",
     view: "Sea View / City View",
-    images: ["/images/rooms/premier-1.jpg", "/images/rooms/premier-2.jpg", "/images/rooms/premier-3.jpg"],
+    images: [
+      "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1200&q=80",
+    ],
     amenities: ["Free Wi-Fi", "Rain Shower", "Bathtub", "Mini Bar", "Smart TV", "Bose Speaker", "Room Service", "Safe", "Air Conditioning", "Butler Service"],
     features: ["Panoramic View", "Soaking Tub", "Sitting Area", "Bose Sound System", "Evening Turndown"],
     isAvailable: true,
@@ -59,7 +67,11 @@ export const rooms: Room[] = [
     bedType: "King",
     floor: "8th - 15th Floor",
     view: "Bay of Bengal View",
-    images: ["/images/rooms/executive-1.jpg", "/images/rooms/executive-2.jpg", "/images/rooms/executive-3.jpg"],
+    images: [
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+    ],
     amenities: ["Free Wi-Fi", "Rain Shower", "Deep Soaking Tub", "Mini Bar", "Smart TV", "Bose Speaker", "24/7 Butler", "Room Service", "Safe", "Air Conditioning", "Nespresso", "Complimentary Breakfast"],
     features: ["Bay of Bengal View", "Separate Living Room", "Private Dining", "Dual Vanity", "Bespoke Artwork", "Walk-in Closet"],
     isAvailable: true,
@@ -79,7 +91,11 @@ export const rooms: Room[] = [
     bedType: "King",
     floor: "Penthouse Level",
     view: "180° Marina Coastline Panorama",
-    images: ["/images/rooms/presidential-1.jpg", "/images/rooms/presidential-2.jpg", "/images/rooms/presidential-3.jpg"],
+    images: [
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+    ],
     amenities: ["Free Wi-Fi", "Rain Shower", "Jacuzzi", "Full Bar", "Bang & Olufsen TV", "B&O Sound", "24/7 Butler Team", "Room Service", "Safe", "Climate Control", "Nespresso", "All Meals Included", "Airport Transfer", "Spa Access"],
     features: ["180° Ocean Panorama", "Private Terrace", "Grand Salon", "Dining Room for 8", "Study & Library", "Personal Chef", "Canopy Bed", "Two Marble Bathrooms", "Jacuzzi"],
     isAvailable: true,
@@ -98,7 +114,11 @@ export const rooms: Room[] = [
     bedType: "2 King Beds",
     floor: "Top Floor",
     view: "360° City & Sea Panorama",
-    images: ["/images/rooms/peninsula-1.jpg", "/images/rooms/peninsula-2.jpg", "/images/rooms/peninsula-3.jpg"],
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80",
+    ],
     amenities: ["Free Wi-Fi", "Rain Shower", "Jacuzzi", "Private Pool", "Full Bar", "Bang & Olufsen", "24/7 Butler Team", "Private Chef", "Safe", "Climate Control", "All Meals", "Airport Helicopter", "Spa Room", "Gym"],
     features: ["360° Panoramic Views", "Baby Grand Piano", "Private Spa Room", "Private Plunge Pool", "Formal Dining Room", "Kitchen", "Grand Foyer", "Two Master Bedrooms", "Entertainment System"],
     isAvailable: true,
@@ -115,8 +135,11 @@ export const diningVenues: DiningVenue[] = [
     cuisine: "Modern Indian",
     description: "The Marina is our signature restaurant, offering a contemporary interpretation of India's rich culinary heritage. Set against floor-to-ceiling windows overlooking the Bay of Bengal, our Executive Chef crafts dishes that celebrate local Tamil Nadu flavors with modern techniques. The tasting menu is a journey through the spice routes, with each course paired with wines from our award-winning cellar.",
     shortDescription: "Contemporary Indian cuisine with Bay of Bengal views",
-    image: "/images/dining/marina.jpg",
-    images: ["/images/dining/marina-1.jpg", "/images/dining/marina-2.jpg"],
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+    ],
     operatingHours: "Dinner: 7:00 PM – 11:00 PM",
     dressCode: "Smart Elegant",
     highlights: ["Bay of Bengal Views", "Tasting Menu", "Wine Pairing", "Live Kitchen", "Vegetarian Degustation"],
@@ -128,8 +151,11 @@ export const diningVenues: DiningVenue[] = [
     cuisine: "Pan-Asian",
     description: "Jade Palace transports you to the Far East with authentic flavors from China, Japan, Thailand, and Vietnam. The restaurant features an open kitchen where our team of Asian master chefs prepare sushi, dim sum, Peking duck, and wok specialties with theatrical precision. Private dining tatami rooms are available for intimate gatherings.",
     shortDescription: "Authentic Pan-Asian cuisine with open kitchen theatrics",
-    image: "/images/dining/jade.jpg",
-    images: ["/images/dining/jade-1.jpg", "/images/dining/jade-2.jpg"],
+    image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1579027989536-b7b1f875659b?auto=format&fit=crop&w=1200&q=80",
+    ],
     operatingHours: "Lunch: 12:30 PM – 3:00 PM | Dinner: 7:00 PM – 11:30 PM",
     dressCode: "Smart Casual",
     highlights: ["Live Sushi Counter", "Dim Sum Brunch", "Tatami Rooms", "Sake Collection", "Teppanyaki"],
@@ -141,8 +167,11 @@ export const diningVenues: DiningVenue[] = [
     cuisine: "International Buffet & All-Day Dining",
     description: "A bright and airy all-day dining venue, The Verandah serves an extensive international buffet for breakfast and lunch, transforming into an à la carte experience for dinner. The open-air terrace section offers al fresco dining amidst lush tropical gardens, making it the perfect setting for a leisurely meal at any time of day.",
     shortDescription: "All-day international dining with tropical garden terrace",
-    image: "/images/dining/verandah.jpg",
-    images: ["/images/dining/verandah-1.jpg", "/images/dining/verandah-2.jpg"],
+    image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+    ],
     operatingHours: "Breakfast: 6:30 AM – 10:30 AM | Lunch: 12:30 PM – 3:00 PM | Dinner: 7:00 PM – 11:00 PM",
     dressCode: "Casual Elegant",
     highlights: ["Lavish Breakfast Buffet", "Garden Terrace", "Live Cooking Stations", "Sunday Champagne Brunch", "Kids Menu"],
@@ -154,8 +183,11 @@ export const diningVenues: DiningVenue[] = [
     cuisine: "Bar & Lounge",
     description: "An intimate retreat for connoisseurs, The Whiskey Lounge houses over 200 rare whiskies from Scotland, Japan, Ireland, and India. Sink into leather armchairs as our master mixologist crafts bespoke cocktails. Live jazz on weekends adds to the sophisticated ambiance. A curated tapas menu complements the liquid offerings.",
     shortDescription: "200+ rare whiskies, bespoke cocktails & weekend jazz",
-    image: "/images/dining/whiskey.jpg",
-    images: ["/images/dining/whiskey-1.jpg", "/images/dining/whiskey-2.jpg"],
+    image: "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1200&q=80",
+    ],
     operatingHours: "5:00 PM – 1:00 AM",
     dressCode: "Smart Casual",
     highlights: ["200+ Whisky Collection", "Bespoke Cocktails", "Live Jazz Weekends", "Cigar Selection", "Tapas Menu"],
@@ -164,12 +196,12 @@ export const diningVenues: DiningVenue[] = [
 
 // ===== SPA =====
 export const spaServices: SpaService[] = [
-  { id: "1", name: "Peninsula Signature Massage", category: "Massage", description: "A bespoke full-body massage combining Swedish and deep tissue techniques with warm aromatic oils. Our signature treatment begins with a foot ritual and concludes with a scalp massage.", duration: "90 min", price: 8000, image: "/images/spa/massage.jpg" },
-  { id: "2", name: "Ayurvedic Abhyanga", category: "Ayurveda", description: "An ancient Ayurvedic oil massage that promotes detoxification and deep relaxation. Warm herbal oils are selected based on your dosha type.", duration: "75 min", price: 7000, image: "/images/spa/ayurveda.jpg" },
-  { id: "3", name: "Royal Gold Facial", category: "Facial", description: "An opulent facial treatment using 24-karat gold-infused products to restore radiance, firm skin, and reduce fine lines. Includes a décolleté massage.", duration: "60 min", price: 6500, image: "/images/spa/facial.jpg" },
-  { id: "4", name: "Couple's Retreat", category: "Couples", description: "Share a blissful experience in our private couple's suite. Includes champagne welcome, dual massages, aromatic bath, and a light spa cuisine meal.", duration: "150 min", price: 18000, image: "/images/spa/couples.jpg" },
-  { id: "5", name: "Detox Body Wrap", category: "Body", description: "A purifying seaweed and green clay body wrap that draws out impurities and nourishes the skin. Followed by a hydrating body butter application.", duration: "90 min", price: 5500, image: "/images/spa/bodywrap.jpg" },
-  { id: "6", name: "Stress Relief Package", category: "Wellness", description: "A comprehensive wellness journey including aromatherapy massage, hot stone therapy, and guided meditation in our Zen garden.", duration: "180 min", price: 12000, image: "/images/spa/wellness.jpg" },
+  { id: "1", name: "Peninsula Signature Massage", category: "Massage", description: "A bespoke full-body massage combining Swedish and deep tissue techniques with warm aromatic oils. Our signature treatment begins with a foot ritual and concludes with a scalp massage.", duration: "90 min", price: 8000, image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" },
+  { id: "2", name: "Ayurvedic Abhyanga", category: "Ayurveda", description: "An ancient Ayurvedic oil massage that promotes detoxification and deep relaxation. Warm herbal oils are selected based on your dosha type.", duration: "75 min", price: 7000, image: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80" },
+  { id: "3", name: "Royal Gold Facial", category: "Facial", description: "An opulent facial treatment using 24-karat gold-infused products to restore radiance, firm skin, and reduce fine lines. Includes a décolleté massage.", duration: "60 min", price: 6500, image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80" },
+  { id: "4", name: "Couple's Retreat", category: "Couples", description: "Share a blissful experience in our private couple's suite. Includes champagne welcome, dual massages, aromatic bath, and a light spa cuisine meal.", duration: "150 min", price: 18000, image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80" },
+  { id: "5", name: "Detox Body Wrap", category: "Body", description: "A purifying seaweed and green clay body wrap that draws out impurities and nourishes the skin. Followed by a hydrating body butter application.", duration: "90 min", price: 5500, image: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80" },
+  { id: "6", name: "Stress Relief Package", category: "Wellness", description: "A comprehensive wellness journey including aromatherapy massage, hot stone therapy, and guided meditation in our Zen garden.", duration: "180 min", price: 12000, image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80" },
 ];
 
 // ===== EVENTS =====
@@ -180,8 +212,11 @@ export const eventVenues: EventVenue[] = [
     description: "Our magnificent Grand Ballroom is a breathtaking space for the most prestigious events. With soaring 8-meter ceilings adorned with crystal chandeliers, and a pre-function area with garden access, it sets the stage for unforgettable weddings, galas, and celebrations.",
     capacity: 800,
     size: "750 sqm / 8073 sq ft",
-    image: "/images/events/ballroom.jpg",
-    images: ["/images/events/ballroom-1.jpg", "/images/events/ballroom-2.jpg"],
+    image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80",
+    ],
     features: ["Crystal Chandeliers", "Built-in Stage", "State-of-art AV", "Green Room", "Pre-function Foyer", "Garden Access"],
     suitableFor: ["Weddings", "Galas", "Award Ceremonies", "Corporate Events"],
   },
@@ -191,8 +226,8 @@ export const eventVenues: EventVenue[] = [
     description: "An exclusive boardroom designed for high-level meetings and corporate gatherings. Equipped with the latest teleconferencing technology, a private pantry, and commanding views of the city skyline.",
     capacity: 24,
     size: "65 sqm / 700 sq ft",
-    image: "/images/events/boardroom.jpg",
-    images: ["/images/events/boardroom-1.jpg"],
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
+    images: ["https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80"],
     features: ["Video Conferencing", "Presentation Screen", "Private Pantry", "City Views", "Soundproofed"],
     suitableFor: ["Board Meetings", "Executive Retreats", "Private Dining"],
   },
@@ -202,8 +237,11 @@ export const eventVenues: EventVenue[] = [
     description: "A stunning outdoor venue set amidst manicured gardens and water features. The pavilion offers a romantic open-air setting perfect for intimate weddings, cocktail parties, and sunset soirées.",
     capacity: 300,
     size: "500 sqm outdoor area",
-    image: "/images/events/garden.jpg",
-    images: ["/images/events/garden-1.jpg", "/images/events/garden-2.jpg"],
+    image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80",
+    ],
     features: ["Open Air", "Water Features", "Fairy Lights", "Built-in Bar", "Dance Floor", "Landscaped Gardens"],
     suitableFor: ["Intimate Weddings", "Cocktail Parties", "Sunset Events", "Themed Nights"],
   },
@@ -220,18 +258,18 @@ export const testimonials: Testimonial[] = [
 
 // ===== GALLERY =====
 export const galleryImages: GalleryImage[] = [
-  { id: "1", url: "/images/gallery/exterior-1.jpg", alt: "Peninsula Chennai Grand Entrance", category: "exterior", order: 1 },
-  { id: "2", url: "/images/gallery/lobby-1.jpg", alt: "Grand Lobby with Crystal Chandelier", category: "lobby", order: 2 },
-  { id: "3", url: "/images/gallery/room-1.jpg", alt: "Deluxe Room Interior", category: "rooms", order: 3 },
-  { id: "4", url: "/images/gallery/room-2.jpg", alt: "Presidential Suite Living Room", category: "rooms", order: 4 },
-  { id: "5", url: "/images/gallery/dining-1.jpg", alt: "The Marina Restaurant", category: "dining", order: 5 },
-  { id: "6", url: "/images/gallery/dining-2.jpg", alt: "Jade Palace Interior", category: "dining", order: 6 },
-  { id: "7", url: "/images/gallery/pool-1.jpg", alt: "Infinity Pool at Sunset", category: "pool", order: 7 },
-  { id: "8", url: "/images/gallery/spa-1.jpg", alt: "Spa Treatment Room", category: "spa", order: 8 },
-  { id: "9", url: "/images/gallery/events-1.jpg", alt: "Grand Ballroom Wedding Setup", category: "events", order: 9 },
-  { id: "10", url: "/images/gallery/exterior-2.jpg", alt: "Hotel at Night", category: "exterior", order: 10 },
-  { id: "11", url: "/images/gallery/pool-2.jpg", alt: "Pool Deck Cabanas", category: "pool", order: 11 },
-  { id: "12", url: "/images/gallery/lobby-2.jpg", alt: "Lobby Lounge Area", category: "lobby", order: 12 },
+  { id: "1", url: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80", alt: "Peninsula Chennai Grand Illuminated Facade", category: "exterior", order: 1 },
+  { id: "2", url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80", alt: "Grand Lobby with Imperial Columns & Chandelier", category: "lobby", order: 2 },
+  { id: "3", url: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80", alt: "Deluxe King Bed Suite", category: "rooms", order: 3 },
+  { id: "4", url: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80", alt: "Presidential Suite Oceanfront Living Salon", category: "rooms", order: 4 },
+  { id: "5", url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80", alt: "The Marina Fine Dining Hall", category: "dining", order: 5 },
+  { id: "6", url: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1200&q=80", alt: "Jade Palace Asian Dining Pavilion", category: "dining", order: 6 },
+  { id: "7", url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80", alt: "Rooftop Oceanview Infinity Pool at Sunset", category: "pool", order: 7 },
+  { id: "8", url: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80", alt: "Private Ayurvedic Spa Treatment Sanctuary", category: "spa", order: 8 },
+  { id: "9", url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80", alt: "The Grand Ballroom Royal Gala Reception", category: "events", order: 9 },
+  { id: "10", url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80", alt: "Marina Beachfront Sunrise & Hotel Grounds", category: "exterior", order: 10 },
+  { id: "11", url: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80", alt: "Private Poolside Luxury Cabanas", category: "pool", order: 11 },
+  { id: "12", url: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1200&q=80", alt: "Colonnade Walkway and Water Mirrors", category: "lobby", order: 12 },
 ];
 
 // ===== OFFERS =====
@@ -242,7 +280,7 @@ export const offers: Offer[] = [
     slug: "early-bird-escape",
     description: "Plan ahead and save. Book 30 days in advance and enjoy 25% off our best available rates. Includes complimentary breakfast for two and a welcome amenity.",
     shortDescription: "Book 30 days ahead, save 25% + free breakfast",
-    image: "/images/offers/early-bird.jpg",
+    image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=800&q=80",
     discountType: "percentage",
     discountValue: 25,
     promoCode: "EARLYBIRD25",
@@ -258,7 +296,7 @@ export const offers: Offer[] = [
     slug: "romantic-getaway",
     description: "Celebrate love with our curated romantic package. Enjoy a suite upgrade, couples spa treatment, candlelit dinner at The Marina, and a bottle of premium champagne.",
     shortDescription: "Suite upgrade + couples spa + candlelit dinner",
-    image: "/images/offers/romantic.jpg",
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
     discountType: "percentage",
     discountValue: 15,
     promoCode: "ROMANCE15",
@@ -274,7 +312,7 @@ export const offers: Offer[] = [
     slug: "weekend-indulgence",
     description: "Transform your weekend with our all-inclusive package. Two nights in a Premier Room, all meals, one spa treatment per person, and late checkout until 4 PM.",
     shortDescription: "2 nights all-inclusive with spa & late checkout",
-    image: "/images/offers/weekend.jpg",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
     discountType: "percentage",
     discountValue: 20,
     promoCode: "WEEKEND20",
@@ -392,4 +430,3 @@ export const hotelInfo = {
     youtube: "https://youtube.com/peninsulachennai",
   },
 };
-
