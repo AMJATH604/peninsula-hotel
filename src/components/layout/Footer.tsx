@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, ArrowUp, Clock, Heart, Globe, MessageCircle } from "lucide-react";
 import { hotelInfo } from "@/lib/data";
-import { PeninsulaLogo } from "./Header";
+import { PeninsulaFullLogo } from "./Header";
 
 const quickLinks = [
   { name: "Rooms & Suites", href: "/rooms" },
@@ -43,12 +43,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Column 1 — Brand */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-6">
-              <PeninsulaLogo size={44} />
-              <div>
-                <span className="text-[9px] tracking-[0.2em] uppercase text-gold/80 block">Hotel</span>
-                <span className="text-xl font-playfair tracking-[0.12em]">PENINSULA</span>
-              </div>
+            <div className="mb-6">
+              <PeninsulaFullLogo size={48} textColor="text-white" />
             </div>
             <p className="text-white/50 text-sm leading-relaxed mb-6">
               {hotelInfo.description}

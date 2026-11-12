@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { Phone, Menu, X, Mail, MapPin } from "lucide-react";
 
@@ -16,32 +17,52 @@ const navLinks = [
   { name: "Contact", href: "/contact" },
 ];
 
-// SVG Logo component recreated from the visiting card
-function PeninsulaLogo({ className = "", size = 40 }: { className?: string; size?: number }) {
+// Logo component using the actual hotel logo image
+function PeninsulaLogo({ size = 40, className = "" }: { size?: number; className?: string }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 80 80"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      {/* Diamond shape rotated 45 degrees with wave pattern inside */}
-      <g transform="translate(40, 40) rotate(45)">
-        <rect x="-28" y="-28" width="56" height="56" rx="4" fill="none" stroke="#C8A97E" strokeWidth="2.5" />
-      </g>
-      {/* Wave lines inside - representing the Peninsula logo */}
-      <g transform="translate(40, 30)">
-        <path d="M-14 0 Q-7 -8 0 0 Q7 8 14 0" stroke="#C8A97E" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M-14 8 Q-7 0 0 8 Q7 16 14 8" stroke="#C8A97E" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M-14 16 Q-7 8 0 16 Q7 24 14 16" stroke="#C8A97E" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      </g>
-    </svg>
+    <div className={`relative flex-shrink-0 ${className}`} style={{ width: size, height: size }}>
+      <Image
+        src="/logo.jpg"
+        alt="Hotel Peninsula Logo"
+        width={size}
+        height={size}
+        className="object-contain"
+        priority
+      />
+    </div>
   );
 }
 
-export { PeninsulaLogo };
+// Full logo with icon + text matching the brand identity
+function PeninsulaFullLogo({
+  size = 40,
+  textColor = "text-white",
+  showText = true,
+}: {
+  size?: number;
+  textColor?: string;
+  showText?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <PeninsulaLogo size={size} />
+      {showText && (
+        <div className="flex flex-col leading-none">
+          <span className="text-[9px] tracking-[0.25em] uppercase font-semibold text-gold opacity-90">
+            Hotel
+          </span>
+          <span
+            className={`text-lg md:text-xl font-playfair tracking-[0.08em] font-bold ${textColor} transition-colors duration-500`}
+          >
+            PENINSULA
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export { PeninsulaLogo, PeninsulaFullLogo };
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -90,7 +111,7 @@ export default function Header() {
 
       {/* Scroll Progress */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold via-gold-light to-gold z-[60] origin-left"
+        className="fixed top-0 left-0 right-0 h-[2px] scroll-progress z-[60] origin-left"
         style={{ scaleX: scrollYProgress }}
       />
 
@@ -98,26 +119,17 @@ export default function Header() {
       <header
         className={`fixed left-0 right-0 z-50 transition-all duration-700 ease-luxury ${
           isScrolled
-            ? "top-0 bg-white/95 backdrop-blur-xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] py-3"
-            : "top-[32px] bg-transparent py-5"
+            ? "top-0 bg-white/95 backdrop-blur-xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] py-2"
+            : "top-[32px] bg-transparent py-4"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <PeninsulaLogo size={isScrolled ? 36 : 42} />
-            <div className="flex flex-col">
-              <span className="text-[10px] tracking-[0.2em] uppercase font-medium text-gold opacity-80">
-                Hotel
-              </span>
-              <span
-                className={`text-xl md:text-2xl font-playfair tracking-[0.12em] transition-colors duration-500 ${
-                  isScrolled ? "text-navy" : "text-white"
-                } group-hover:text-gold`}
-              >
-                PENINSULA
-              </span>
-            </div>
+          <Link href="/" className="group">
+            <PeninsulaFullLogo
+              size={isScrolled ? 38 : 44}
+              textColor={isScrolled ? "text-navy group-hover:text-gold" : "text-white group-hover:text-gold"}
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -172,12 +184,8 @@ export default function Header() {
           >
             {/* Mobile Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3">
-                <PeninsulaLogo size={36} />
-                <div className="flex flex-col">
-                  <span className="text-[9px] tracking-[0.2em] uppercase text-gold/80">Hotel</span>
-                  <span className="text-lg font-playfair tracking-[0.12em] text-white">PENINSULA</span>
-                </div>
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                <PeninsulaFullLogo size={36} textColor="text-white" />
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
