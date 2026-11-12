@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import {
@@ -17,7 +18,6 @@ import {
   Clock,
   Users,
   Sparkles,
-  Play,
   ArrowUpRight,
 } from "lucide-react";
 import { rooms, diningVenues, testimonials, hotelInfo } from "@/lib/data";
@@ -340,8 +340,24 @@ function MarqueeBanner() {
   );
 }
 
-// ===== BOOKING WIDGET =====
+// ===== BOOKING WIDGET — passes selections to /book page =====
 function QuickBooking() {
+  const router = useRouter();
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("2");
+  const [roomType, setRoomType] = useState("");
+
+  const handleCheckAvailability = () => {
+    const params = new URLSearchParams();
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    if (guests) params.set("guests", guests);
+    if (roomType) params.set("roomType", roomType);
+    const qs = params.toString();
+    router.push(`/book${qs ? `?${qs}` : ""}`);
+  };
+
   return (
     <section className="relative z-30 -mt-24 px-4">
       <div className="max-w-5xl mx-auto">
@@ -353,6 +369,8 @@ function QuickBooking() {
               </label>
               <input
                 type="date"
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
                 className="booking-input"
               />
             </div>
@@ -362,6 +380,8 @@ function QuickBooking() {
               </label>
               <input
                 type="date"
+                value={checkOut}
+                onChange={(e) => setCheckOut(e.target.value)}
                 className="booking-input"
               />
             </div>
@@ -369,31 +389,39 @@ function QuickBooking() {
               <label className="text-[10px] tracking-[0.15em] uppercase text-navy/40 font-medium mb-2 block">
                 Guests
               </label>
-              <select className="booking-input appearance-none">
-                <option>1 Guest</option>
-                <option>2 Guests</option>
-                <option>3 Guests</option>
-                <option>4 Guests</option>
+              <select
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+                className="booking-input appearance-none"
+              >
+                <option value="1">1 Guest</option>
+                <option value="2">2 Guests</option>
+                <option value="3">3 Guests</option>
+                <option value="4">4 Guests</option>
               </select>
             </div>
             <div>
               <label className="text-[10px] tracking-[0.15em] uppercase text-navy/40 font-medium mb-2 block">
                 Room Type
               </label>
-              <select className="booking-input appearance-none">
-                <option>Any Room</option>
-                <option>Deluxe Room</option>
-                <option>Premier Room</option>
-                <option>Executive Suite</option>
-                <option>Peninsula Suite</option>
+              <select
+                value={roomType}
+                onChange={(e) => setRoomType(e.target.value)}
+                className="booking-input appearance-none"
+              >
+                <option value="">Any Room</option>
+                <option value="1">Deluxe Room</option>
+                <option value="2">Premier Room</option>
+                <option value="3">Executive Suite</option>
+                <option value="4">Peninsula Suite</option>
               </select>
             </div>
-            <Link
-              href="/book"
+            <button
+              onClick={handleCheckAvailability}
               className="btn-gold rounded-xl text-center"
             >
               Check Availability
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -417,7 +445,7 @@ function AboutSection() {
                 {/* Main image */}
                 <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
                   <Image
-                    src="https://images.unsplash.com/photo-1590490360182-c33d955f3174?auto=format&fit=crop&w=800&q=85"
+                    src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=85"
                     alt="Hotel Peninsula — Elegant Interior"
                     fill
                     className="object-cover"

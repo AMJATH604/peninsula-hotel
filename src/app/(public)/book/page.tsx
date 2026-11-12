@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -24,6 +25,15 @@ import { formatCurrency } from "@/lib/utils";
 const steps = ["Select Dates", "Choose Room", "Guest Details", "Payment"];
 
 export default function BookingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-navy/40">Loading...</div></div>}>
+      <BookingPageContent />
+    </Suspense>
+  );
+}
+
+function BookingPageContent() {
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [promoLoading, setPromoLoading] = useState(false);
@@ -43,6 +53,24 @@ export default function BookingPage() {
     specialRequests: "",
     promoCode: "",
   });
+
+  // Pre-fill from URL query params (from landing page Check Availability widget)
+  useEffect(() => {
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
+    const guests = searchParams.get("guests");
+    const roomType = searchParams.get("roomType");
+
+    if (checkIn || checkOut || guests || roomType) {
+      setBooking((prev) => ({
+        ...prev,
+        ...(checkIn && { checkIn }),
+        ...(checkOut && { checkOut }),
+        ...(guests && { adults: parseInt(guests, 10) || 2 }),
+        ...(roomType && { roomId: roomType }),
+      }));
+    }
+  }, [searchParams]);
 
   const selectedRoom = rooms.find((r) => r.id === booking.roomId) || rooms[0];
   const nights =

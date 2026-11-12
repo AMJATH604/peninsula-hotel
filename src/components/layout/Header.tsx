@@ -17,52 +17,35 @@ const navLinks = [
   { name: "Contact", href: "/contact" },
 ];
 
-// Logo component using the actual hotel logo image
-function PeninsulaLogo({ size = 40, className = "" }: { size?: number; className?: string }) {
+// Logo component — uses the actual hotel brand logo image
+// Displayed in a clean rounded container that works on both light and dark backgrounds
+function PeninsulaLogo({
+  height = 48,
+  variant = "auto",
+  className = "",
+}: {
+  height?: number;
+  variant?: "light" | "dark" | "auto";
+  className?: string;
+}) {
   return (
-    <div className={`relative flex-shrink-0 ${className}`} style={{ width: size, height: size }}>
+    <div
+      className={`relative flex-shrink-0 overflow-hidden rounded-lg ${className}`}
+      style={{ height }}
+    >
       <Image
         src="/logo.jpg"
-        alt="Hotel Peninsula Logo"
-        width={size}
-        height={size}
-        className="object-contain"
+        alt="Hotel Peninsula"
+        width={Math.round(height * 1)}
+        height={height}
+        className="object-contain h-full w-auto"
         priority
       />
     </div>
   );
 }
 
-// Full logo with icon + text matching the brand identity
-function PeninsulaFullLogo({
-  size = 40,
-  textColor = "text-white",
-  showText = true,
-}: {
-  size?: number;
-  textColor?: string;
-  showText?: boolean;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <PeninsulaLogo size={size} />
-      {showText && (
-        <div className="flex flex-col leading-none">
-          <span className="text-[9px] tracking-[0.25em] uppercase font-semibold text-gold opacity-90">
-            Hotel
-          </span>
-          <span
-            className={`text-lg md:text-xl font-playfair tracking-[0.08em] font-bold ${textColor} transition-colors duration-500`}
-          >
-            PENINSULA
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export { PeninsulaLogo, PeninsulaFullLogo };
+export { PeninsulaLogo };
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -120,15 +103,19 @@ export default function Header() {
         className={`fixed left-0 right-0 z-50 transition-all duration-700 ease-luxury ${
           isScrolled
             ? "top-0 bg-white/95 backdrop-blur-xl shadow-[0_2px_40px_rgba(0,0,0,0.08)] py-2"
-            : "top-[32px] bg-transparent py-4"
+            : "top-[32px] bg-transparent py-3"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="group">
-            <PeninsulaFullLogo
-              size={isScrolled ? 38 : 44}
-              textColor={isScrolled ? "text-navy group-hover:text-gold" : "text-white group-hover:text-gold"}
+          {/* Logo — just the brand image, no separate text */}
+          <Link href="/" className="group flex-shrink-0">
+            <PeninsulaLogo
+              height={isScrolled ? 44 : 52}
+              className={`transition-all duration-500 ${
+                isScrolled
+                  ? "bg-transparent"
+                  : "bg-white/90 backdrop-blur-sm shadow-sm"
+              }`}
             />
           </Link>
 
@@ -185,7 +172,7 @@ export default function Header() {
             {/* Mobile Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <PeninsulaFullLogo size={36} textColor="text-white" />
+                <PeninsulaLogo height={40} className="bg-white/90 backdrop-blur-sm" />
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
