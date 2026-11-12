@@ -6,6 +6,7 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const inter = Inter({
@@ -16,27 +17,28 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Peninsula Chennai | Luxury 5-Star Hotel on Marina Beach",
-    template: "%s | Peninsula Chennai",
+    default: "Hotel Peninsula | Premium Hotel in T. Nagar, Chennai",
+    template: "%s | Hotel Peninsula Chennai",
   },
   description:
-    "Experience unparalleled luxury at Peninsula Chennai, a prestigious 5-star hotel on Marina Beach. World-class dining, award-winning spa, magnificent event venues, and impeccable service await you.",
+    "Experience warm hospitality at Hotel Peninsula, a premium hotel in the heart of T. Nagar, Chennai. Comfortable rooms, authentic dining, event spaces, and personalized service. Book direct for best rates.",
   keywords: [
-    "luxury hotel Chennai",
-    "5 star hotel Marina Beach",
-    "Peninsula Chennai",
-    "premium hotel Tamil Nadu",
-    "luxury accommodation Chennai",
+    "hotel Chennai",
+    "Hotel Peninsula Chennai",
+    "hotel T. Nagar",
     "best hotel Chennai",
-    "Marina Beach hotel",
+    "premium hotel T. Nagar",
+    "Chennai accommodation",
+    "G N Chetty Road hotel",
+    "business hotel Chennai",
   ],
   openGraph: {
-    title: "Peninsula Chennai | Luxury 5-Star Hotel",
+    title: "Hotel Peninsula | Premium Hotel in T. Nagar, Chennai",
     description:
-      "Where Chennai Meets Magnificence. Experience world-class luxury on Marina Beach.",
+      "Your home away from home in Chennai. Located at 51, G. N. Chetty Road, T. Nagar — comfortable rooms, authentic dining & warm hospitality.",
     type: "website",
     locale: "en_IN",
-    siteName: "Peninsula Chennai",
+    siteName: "Hotel Peninsula Chennai",
   },
 };
 
@@ -46,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${playfair.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-pearl text-navy">
+      <body className="min-h-full flex flex-col bg-pearl text-charcoal font-inter">
         {children}
       </body>
     </html>

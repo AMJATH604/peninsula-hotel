@@ -1,915 +1,891 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import {
+  ArrowRight,
   Star,
+  MapPin,
+  Phone,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
+  Wifi,
+  Coffee,
+  Utensils,
+  Car,
+  Shield,
+  Clock,
   Users,
-  UtensilsCrossed,
+  Calendar,
   Sparkles,
-  Quote,
-  BedDouble,
-  ArrowUp,
-  Compass,
-  Waves,
-  Award,
 } from "lucide-react";
-import { rooms, diningVenues, testimonials, offers } from "@/lib/data";
-import { formatCurrency } from "@/lib/utils";
+import { rooms, diningVenues, testimonials, hotelInfo } from "@/lib/data";
 
-function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
+// ===== SCROLL-TRIGGERED REVEAL COMPONENT =====
+function RevealOnScroll({
+  children,
+  delay = 0,
+  direction = "up",
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  direction?: "up" | "left" | "right" | "scale";
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+
+  const variants = {
+    up: { hidden: { opacity: 0, y: 60 }, visible: { opacity: 1, y: 0 } },
+    left: { hidden: { opacity: 0, x: -60 }, visible: { opacity: 1, x: 0 } },
+    right: { hidden: { opacity: 0, x: 60 }, visible: { opacity: 1, x: 0 } },
+    scale: { hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } },
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      variants={variants[direction]}
+      transition={{ duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ===== PARALLAX IMAGE COMPONENT =====
+function ParallaxImage({
+  src,
+  alt,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+
+  return (
+    <div ref={ref} className={`overflow-hidden ${className}`}>
+      <motion.div style={{ y }} className="h-[120%] w-full relative -top-[10%]">
+        <Image src={src} alt={alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+      </motion.div>
+    </div>
+  );
+}
+
+// ===== COUNTER ANIMATION =====
+function AnimatedCounter({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!isInView) return;
-    let start = 0;
-    const duration = 2000;
-    const step = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
+    if (isInView) {
+      const duration = 2000;
+      const steps = 60;
+      const increment = target / steps;
+      let current = 0;
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          setCount(target);
+          clearInterval(timer);
+        } else {
+          setCount(Math.floor(current));
+        }
+      }, duration / steps);
+      return () => clearInterval(timer);
+    }
   }, [isInView, target]);
 
   return (
     <span ref={ref}>
-      {count}
-      {suffix}
+      {prefix}{count}{suffix}
     </span>
   );
 }
 
-const experiences = [
-  {
-    title: "Marina Bay Dawn Serenade",
-    subtitle: "Private Sunrise Experience",
-    description: "Begin your morning with fresh artisanal pastries and Ceylon tea served aboard a private seaside pavilion as the sun casts gold across the Bay of Bengal.",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-    tag: "Exclusive",
-  },
-  {
-    title: "Dravidian Architectural Odyssey",
-    subtitle: "Curated Cultural Walk",
-    description: "Explore our collection of rare bronze sculptures, hand-carved Chettinad pillars, and private galleries guided by our in-house cultural curator.",
-    image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
-    tag: "Heritage",
-  },
-  {
-    title: "Sunset Champagne Yachting",
-    subtitle: "Coromandel Coast Voyage",
-    description: "Board The Peninsula yacht for a scenic twilight cruise along Chennai's historic coastal stretch with pairings from our sommelier's private cellar.",
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80",
-    tag: "Adventure",
-  },
-  {
-    title: "Vedic Royal Abhyanga",
-    subtitle: "Ancient Ayurvedic Healing",
-    description: "A synchronised four-hand warm herbal oil ritual designed to dissolve stress, restore vitality, and align internal bio-rhythms.",
-    image: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80",
-    tag: "Wellness",
-  },
-];
-
-export default function HomePage() {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [activeRoomCategory, setActiveRoomCategory] = useState("All");
-  const [showBackToTop, setShowBackToTop] = useState(false);
-
-  // Quick booking state
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState("2 Guests");
-  const [suiteTier, setSuiteTier] = useState("Any Sanctuary");
-
-  // Hero parallax
+// ===== HERO SECTION =====
+function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: heroProgress } = useScroll({
+  const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1]);
+  const textY = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
 
-  const videoY = useTransform(heroProgress, [0, 1], ["0%", "25%"]);
-  const videoScale = useTransform(heroProgress, [0, 1], [1, 1.15]);
-  const contentOpacity = useTransform(heroProgress, [0, 0.65], [1, 0]);
-  const contentY = useTransform(heroProgress, [0, 0.65], [0, -40]);
+  return (
+    <section ref={heroRef} className="relative h-screen overflow-hidden">
+      {/* Background Image with parallax */}
+      <motion.div style={{ scale: heroScale }} className="absolute inset-0">
+        <Image
+          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2000&q=85"
+          alt="Hotel Peninsula Chennai"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+      </motion.div>
 
-  // Back to top visibility
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 500);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+      {/* Overlay */}
+      <div className="hero-overlay absolute inset-0 z-10" />
 
-  // Auto-fill dates
-  useEffect(() => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const threeDays = new Date(today);
-    threeDays.setDate(threeDays.getDate() + 4);
+      {/* Noise texture */}
+      <div className="absolute inset-0 z-10 opacity-[0.04]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")`,
+      }} />
 
-    setCheckIn(tomorrow.toISOString().split("T")[0]);
-    setCheckOut(threeDays.toISOString().split("T")[0]);
-  }, []);
+      {/* Content */}
+      <motion.div
+        style={{ opacity: heroOpacity, y: textY }}
+        className="relative z-20 h-full flex flex-col items-center justify-center text-center px-4"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+        >
+          <span className="text-[11px] tracking-[0.4em] uppercase text-gold font-medium mb-4 block">
+            Welcome to
+          </span>
+        </motion.div>
 
-  // Auto-cycle testimonials
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="font-playfair text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white font-light leading-[0.95] mb-6"
+        >
+          Hotel
+          <br />
+          <span className="text-gradient-gold italic font-normal">Peninsula</span>
+        </motion.h1>
+
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: 80 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
+          className="h-[1px] bg-gold mb-6"
+        />
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.1 }}
+          className="text-white/70 text-sm sm:text-base md:text-lg tracking-wider max-w-xl mb-10 font-light"
+        >
+          Your home away from home in the heart of
+          <br className="hidden sm:block" />
+          <span className="text-gold/90">T. Nagar, Chennai</span>
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.3 }}
+          className="flex flex-col sm:flex-row items-center gap-4"
+        >
+          <Link href="/book" className="btn-gold rounded-full">
+            Reserve Your Stay
+          </Link>
+          <Link href="/rooms" className="btn-outline-gold rounded-full !border-white/30 !text-white hover:!bg-white hover:!text-navy hover:!border-white">
+            Explore Rooms
+          </Link>
+        </motion.div>
+      </motion.div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+      >
+        <span className="text-white/40 text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          <ChevronDown className="w-4 h-4 text-gold/60" />
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
+
+// ===== BOOKING WIDGET =====
+function QuickBooking() {
+  return (
+    <section className="relative z-30 -mt-20 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.1)] p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-navy/50 font-medium mb-2 block">
+                Check In
+              </label>
+              <input
+                type="date"
+                className="w-full border-b-2 border-gold/30 focus:border-gold pb-2 text-navy font-medium outline-none transition-colors bg-transparent"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-navy/50 font-medium mb-2 block">
+                Check Out
+              </label>
+              <input
+                type="date"
+                className="w-full border-b-2 border-gold/30 focus:border-gold pb-2 text-navy font-medium outline-none transition-colors bg-transparent"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-navy/50 font-medium mb-2 block">
+                Guests
+              </label>
+              <select className="w-full border-b-2 border-gold/30 focus:border-gold pb-2 text-navy font-medium outline-none transition-colors bg-transparent appearance-none">
+                <option>1 Guest</option>
+                <option>2 Guests</option>
+                <option>3 Guests</option>
+                <option>4 Guests</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] tracking-[0.15em] uppercase text-navy/50 font-medium mb-2 block">
+                Room Type
+              </label>
+              <select className="w-full border-b-2 border-gold/30 focus:border-gold pb-2 text-navy font-medium outline-none transition-colors bg-transparent appearance-none">
+                <option>Any Room</option>
+                <option>Deluxe Room</option>
+                <option>Premier Room</option>
+                <option>Executive Suite</option>
+                <option>Peninsula Suite</option>
+              </select>
+            </div>
+            <Link
+              href="/book"
+              className="btn-gold rounded-xl text-center"
+            >
+              Check Availability
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== ABOUT SECTION =====
+function AboutSection() {
+  return (
+    <section className="py-24 md:py-32 bg-warm-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left — Images */}
+          <div className="relative">
+            <RevealOnScroll direction="left">
+              <div className="relative">
+                <div className="aspect-[4/5] rounded-2xl overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+                    alt="Hotel Peninsula Lobby"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                {/* Floating overlay card */}
+                <div className="absolute -bottom-8 -right-4 md:-right-8 bg-navy rounded-xl p-6 text-white shadow-2xl max-w-[200px]">
+                  <div className="text-3xl font-playfair text-gold mb-1">
+                    <AnimatedCounter target={20} suffix="+" />
+                  </div>
+                  <p className="text-white/60 text-xs tracking-wider">Years of warm hospitality</p>
+                </div>
+              </div>
+            </RevealOnScroll>
+          </div>
+
+          {/* Right — Content */}
+          <div className="lg:pl-8">
+            <RevealOnScroll direction="right" delay={0.2}>
+              <span className="section-subtitle">About Us</span>
+              <h2 className="section-title">
+                A Legacy of <br />
+                <span className="italic text-gold">Warm Hospitality</span>
+              </h2>
+              <div className="luxury-divider-left" />
+              <p className="text-charcoal/60 text-base leading-relaxed mb-6">
+                Located at the heart of T. Nagar — Chennai&apos;s most vibrant neighbourhood — Hotel Peninsula 
+                has been welcoming guests with warmth and authentic South Indian hospitality since 2005. 
+                Just steps from Pondy Bazaar and Ranganathan Street, we offer the perfect blend of 
+                comfort, convenience, and genuine care.
+              </p>
+              <p className="text-charcoal/60 text-base leading-relaxed mb-8">
+                Whether you&apos;re here for business meetings, family celebrations, temple visits, or shopping 
+                excursions, our dedicated team ensures every stay feels like home. From our signature 
+                South Indian breakfast to our attentive 24/7 service, every detail is designed for your comfort.
+              </p>
+
+              {/* Features */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="text-sm text-navy/70">Prime T. Nagar Location</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Utensils className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="text-sm text-navy/70">Authentic South Indian Dining</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Wifi className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="text-sm text-navy/70">High-Speed WiFi</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Car className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="text-sm text-navy/70">Airport Transfer Service</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="text-sm text-navy/70">24/7 Security & CCTV</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Coffee className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="text-sm text-navy/70">Complimentary Breakfast</span>
+                </div>
+              </div>
+
+              <Link href="/about" className="btn-gold rounded-full inline-flex items-center gap-2">
+                Our Story <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </RevealOnScroll>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== ROOMS SECTION =====
+function RoomsSection() {
+  return (
+    <section className="py-24 md:py-32 bg-cream">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealOnScroll>
+          <div className="text-center mb-16">
+            <span className="section-subtitle">Accommodations</span>
+            <h2 className="section-title">
+              Comfortable <span className="italic text-gold">Rooms & Suites</span>
+            </h2>
+            <p className="text-charcoal/50 max-w-2xl mx-auto text-base">
+              From well-appointed deluxe rooms to our premium Peninsula Suite, 
+              find your perfect retreat in the heart of Chennai.
+            </p>
+          </div>
+        </RevealOnScroll>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {rooms.filter(r => r.isFeatured).map((room, index) => (
+            <RevealOnScroll key={room.id} delay={index * 0.15} direction={index % 2 === 0 ? "left" : "right"}>
+              <Link href={`/rooms/${room.slug}`} className="group block">
+                <div className="card-luxury rounded-2xl overflow-hidden">
+                  {/* Image */}
+                  <div className="relative aspect-[16/10] img-zoom">
+                    <Image
+                      src={room.images[0]}
+                      alt={room.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                    {/* Price badge */}
+                    <div className="absolute top-4 right-4 glass-dark rounded-full px-4 py-2 text-white">
+                      <span className="text-gold font-semibold text-lg">₹{room.price.toLocaleString()}</span>
+                      <span className="text-white/50 text-xs"> / night</span>
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10px] tracking-[0.15em] uppercase text-gold/80 font-medium">{room.category}</span>
+                      <span className="w-1 h-1 rounded-full bg-gold/40" />
+                      <span className="text-[10px] tracking-wider text-navy/40">{room.size}</span>
+                    </div>
+                    <h3 className="text-xl font-playfair text-navy mb-2 group-hover:text-gold transition-colors">
+                      {room.name}
+                    </h3>
+                    <p className="text-charcoal/50 text-sm leading-relaxed mb-4">
+                      {room.shortDescription}
+                    </p>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      {room.amenities.slice(0, 4).map((amenity) => (
+                        <span key={amenity} className="text-[10px] tracking-wider text-navy/40 bg-cream rounded-full px-3 py-1">
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                      <span className="text-xs text-navy/40">Up to {room.maxOccupancy} guests · {room.bedType}</span>
+                      <span className="text-gold text-xs font-semibold tracking-wider uppercase flex items-center gap-1 group-hover:gap-2 transition-all">
+                        View Details <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </RevealOnScroll>
+          ))}
+        </div>
+
+        <RevealOnScroll delay={0.4}>
+          <div className="text-center mt-12">
+            <Link href="/rooms" className="btn-outline-gold rounded-full !border-navy/20 !text-navy hover:!bg-navy hover:!text-white hover:!border-navy inline-flex items-center gap-2">
+              View All Rooms <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </RevealOnScroll>
+      </div>
+    </section>
+  );
+}
+
+// ===== PARALLAX STATS SECTION =====
+function StatsSection() {
+  return (
+    <section className="relative py-24 overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0">
+        <Image
+          src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=2000&q=80"
+          alt="Hotel Ambiance"
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-navy/85" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+          {[
+            { value: 20, suffix: "+", label: "Years of Service" },
+            { value: 45, suffix: "", label: "Comfortable Rooms" },
+            { value: 15000, suffix: "+", label: "Happy Guests" },
+            { value: 4.6, suffix: "★", label: "Guest Rating" },
+          ].map((stat, index) => (
+            <RevealOnScroll key={stat.label} delay={index * 0.1}>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-playfair text-gold mb-2">
+                  {stat.value === 4.6 ? (
+                    <span>{stat.value}{stat.suffix}</span>
+                  ) : (
+                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  )}
+                </div>
+                <p className="text-white/50 text-xs tracking-[0.2em] uppercase">{stat.label}</p>
+              </div>
+            </RevealOnScroll>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== DINING SECTION =====
+function DiningSection() {
+  return (
+    <section className="py-24 md:py-32 bg-warm-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left — Content */}
+          <div>
+            <RevealOnScroll direction="left">
+              <span className="section-subtitle">Dining</span>
+              <h2 className="section-title">
+                Taste the <span className="italic text-gold">Authentic Flavors</span>
+              </h2>
+              <div className="luxury-divider-left" />
+              <p className="text-charcoal/60 text-base leading-relaxed mb-8">
+                From aromatic Chettinad curries to crispy dosas served on banana leaves, 
+                our restaurants celebrate the rich culinary heritage of South India. 
+                Start your mornings with our signature filter coffee and end your 
+                evenings at our rooftop Terrace Café.
+              </p>
+
+              <div className="space-y-6 mb-10">
+                {diningVenues.map((venue, i) => (
+                  <div key={venue.id} className="flex items-start gap-4 group">
+                    <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 group-hover:bg-gold/20 transition-colors">
+                      <Utensils className="w-5 h-5 text-gold" />
+                    </div>
+                    <div>
+                      <h4 className="text-navy font-semibold text-base mb-0.5">{venue.name}</h4>
+                      <p className="text-charcoal/50 text-sm">{venue.shortDescription}</p>
+                      <p className="text-gold/70 text-xs mt-1">{venue.operatingHours.split("|")[0].trim()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link href="/dining" className="btn-gold rounded-full inline-flex items-center gap-2">
+                View Menu <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </RevealOnScroll>
+          </div>
+
+          {/* Right — Images */}
+          <RevealOnScroll direction="right" delay={0.2}>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="aspect-[3/4] rounded-2xl overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80"
+                    alt="Peninsula Restaurant"
+                    fill
+                    className="object-cover !relative"
+                    sizes="25vw"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80"
+                    alt="Terrace Café"
+                    fill
+                    className="object-cover !relative"
+                    sizes="25vw"
+                  />
+                </div>
+              </div>
+              <div className="space-y-4 pt-8">
+                <div className="aspect-square rounded-2xl overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80"
+                    alt="South Indian Cuisine"
+                    fill
+                    className="object-cover !relative"
+                    sizes="25vw"
+                  />
+                </div>
+                <div className="aspect-[3/4] rounded-2xl overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80"
+                    alt="Spice Garden"
+                    fill
+                    className="object-cover !relative"
+                    sizes="25vw"
+                  />
+                </div>
+              </div>
+            </div>
+          </RevealOnScroll>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== SERVICES SECTION =====
+function ServicesSection() {
+  return (
+    <section className="py-24 md:py-32 bg-navy relative overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C8A97E' fill-opacity='1'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v22H20v-1.5z'/%3E%3C/g%3E%3C/svg%3E")`,
+      }} />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealOnScroll>
+          <div className="text-center mb-16">
+            <span className="section-subtitle">Services</span>
+            <h2 className="section-title-white">
+              Everything You <span className="italic text-gold">Need</span>
+            </h2>
+            <p className="text-white/40 max-w-xl mx-auto text-base">
+              From the moment you arrive, our dedicated team ensures your complete comfort and satisfaction.
+            </p>
+          </div>
+        </RevealOnScroll>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <RevealOnScroll delay={0} direction="scale">
+            <div className="group p-8 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-500">
+              <div className="w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center mb-5 group-hover:bg-gold/20 transition-colors">
+                <Wifi className="w-6 h-6 text-gold" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Free High-Speed WiFi</h3>
+              <p className="text-white/40 text-sm leading-relaxed">Stay connected with complimentary WiFi throughout the hotel</p>
+            </div>
+          </RevealOnScroll>
+          <RevealOnScroll delay={0.1} direction="scale">
+            <div className="group p-8 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-500">
+              <div className="w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center mb-5 group-hover:bg-gold/20 transition-colors">
+                <Coffee className="w-6 h-6 text-gold" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Complimentary Breakfast</h3>
+              <p className="text-white/40 text-sm leading-relaxed">Start your day with our authentic South Indian breakfast</p>
+            </div>
+          </RevealOnScroll>
+          <RevealOnScroll delay={0.2} direction="scale">
+            <div className="group p-8 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-500">
+              <div className="w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center mb-5 group-hover:bg-gold/20 transition-colors">
+                <Car className="w-6 h-6 text-gold" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Airport Transfers</h3>
+              <p className="text-white/40 text-sm leading-relaxed">Convenient pick-up and drop-off to Chennai International Airport</p>
+            </div>
+          </RevealOnScroll>
+          <RevealOnScroll delay={0.3} direction="scale">
+            <div className="group p-8 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-500">
+              <div className="w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center mb-5 group-hover:bg-gold/20 transition-colors">
+                <Users className="w-6 h-6 text-gold" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Event & Banquet Halls</h3>
+              <p className="text-white/40 text-sm leading-relaxed">Elegant spaces for weddings, conferences, and celebrations</p>
+            </div>
+          </RevealOnScroll>
+          <RevealOnScroll delay={0.4} direction="scale">
+            <div className="group p-8 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-500">
+              <div className="w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center mb-5 group-hover:bg-gold/20 transition-colors">
+                <Shield className="w-6 h-6 text-gold" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">24/7 Security</h3>
+              <p className="text-white/40 text-sm leading-relaxed">Round-the-clock security with CCTV surveillance for your safety</p>
+            </div>
+          </RevealOnScroll>
+          <RevealOnScroll delay={0.5} direction="scale">
+            <div className="group p-8 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-500">
+              <div className="w-14 h-14 rounded-2xl bg-gold/10 flex items-center justify-center mb-5 group-hover:bg-gold/20 transition-colors">
+                <Clock className="w-6 h-6 text-gold" />
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">24/7 Front Desk</h3>
+              <p className="text-white/40 text-sm leading-relaxed">Our friendly staff is always available to assist you</p>
+            </div>
+          </RevealOnScroll>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== TESTIMONIALS SECTION =====
+function TestimonialsSection() {
+  const [current, setCurrent] = useState(0);
+
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 7000);
+      setCurrent((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
-  const filteredRooms =
-    activeRoomCategory === "All"
-      ? rooms.slice(0, 4)
-      : rooms.filter((r) => r.category === activeRoomCategory).slice(0, 4);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <>
-      {/* ===== HERO SECTION WITH PARALLAX VIDEO BACKGROUND ===== */}
-      <section
-        ref={heroRef}
-        className="relative min-h-[95vh] lg:min-h-screen flex flex-col justify-between pt-32 md:pt-36 pb-12 overflow-hidden"
-      >
-        {/* Parallax Video Container */}
-        <motion.div
-          style={{ y: videoY, scale: videoScale }}
-          className="absolute inset-0 z-0 overflow-hidden origin-center will-change-transform"
-        >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2000&q=85"
-            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.75]"
-          >
-            <source src="/videos/hero.mp4" type="video/mp4" />
-          </video>
-          {/* Deep Navy Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A1628]/85 via-[#0A1628]/45 to-[#0A1628]/95" />
-        </motion.div>
-
-        {/* Hero Content with Smooth Scroll Fade */}
-        <motion.div
-          style={{ opacity: contentOpacity, y: contentY }}
-          className="relative z-10 text-center px-4 max-w-4xl mx-auto my-auto py-6"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-[#C9A96E]/30 px-4 py-1.5 rounded-full mb-6"
-          >
-            <Award className="w-3.5 h-3.5 text-[#C9A96E]" />
-            <span className="text-[#C9A96E] text-[10px] md:text-xs tracking-[0.35em] uppercase font-semibold">
-              The Peninsula Chennai • 7-Star Heritage
-            </span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="font-[var(--font-playfair)] text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white mb-6 tracking-wide drop-shadow-2xl leading-[1.12]"
-          >
-            Where Chennai Meets
-            <span className="block text-[#C9A96E] italic mt-2">Magnificence</span>
-          </motion.h1>
-
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: 120 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="h-px bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent mx-auto mb-6"
-          />
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-white/90 text-base md:text-lg font-light tracking-wide mb-8 max-w-2xl mx-auto leading-relaxed"
-          >
-            An iconic oceanfront retreat on Marina Beach Road, delivering Michelin-grade gastronomy, royal Ayurvedic healing, and bespoke sanctuaries.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              href="/rooms"
-              className="bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-8 py-3.5 text-[11px] tracking-[0.25em] uppercase font-bold hover:shadow-2xl hover:shadow-[#C9A96E]/50 transition-all hover:-translate-y-0.5 rounded-sm"
-            >
-              Explore Suites
-            </Link>
-            <Link
-              href="/book"
-              className="border border-[#C9A96E] text-[#C9A96E] backdrop-blur-md bg-[#0A1628]/40 px-8 py-3.5 text-[11px] tracking-[0.25em] uppercase font-semibold hover:bg-[#C9A96E] hover:text-[#0A1628] transition-all rounded-sm"
-            >
-              Reserve Your Stay
-            </Link>
-          </motion.div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="relative z-10 mx-auto mt-4 mb-2 flex flex-col items-center gap-1.5 cursor-pointer group"
-          onClick={() => {
-            const el = document.getElementById("booking-widget");
-            el?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
-          <span className="text-white/60 group-hover:text-[#C9A96E] text-[10px] tracking-[0.3em] uppercase transition-colors">
-            Scroll to Discover
-          </span>
-          <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-            <ChevronDown className="w-5 h-5 text-[#C9A96E]" />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ===== FLOATING INTERACTIVE BOOKING WIDGET ===== */}
-      <section id="booking-widget" className="relative z-20 -mt-10 mb-20 scroll-mt-28">
-        <div className="max-w-5xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="bg-white shadow-2xl border border-[#C9A96E]/30 p-6 md:p-8 rounded-sm"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-              <div>
-                <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block font-medium">
-                  Check In
-                </label>
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full border-b border-[#0A1628]/20 pb-2 text-sm text-[#0A1628] focus:outline-none focus:border-[#C9A96E] transition-colors bg-transparent"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block font-medium">
-                  Check Out
-                </label>
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full border-b border-[#0A1628]/20 pb-2 text-sm text-[#0A1628] focus:outline-none focus:border-[#C9A96E] transition-colors bg-transparent"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block font-medium">
-                  Guests
-                </label>
-                <select
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  className="w-full border-b border-[#0A1628]/20 pb-2 text-sm text-[#0A1628] focus:outline-none focus:border-[#C9A96E] transition-colors bg-transparent cursor-pointer"
-                >
-                  <option value="1 Guest">1 Guest</option>
-                  <option value="2 Guests">2 Guests</option>
-                  <option value="3 Guests">3 Guests</option>
-                  <option value="4+ Guests">4+ Guests</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block font-medium">
-                  Suite Tier
-                </label>
-                <select
-                  value={suiteTier}
-                  onChange={(e) => setSuiteTier(e.target.value)}
-                  className="w-full border-b border-[#0A1628]/20 pb-2 text-sm text-[#0A1628] focus:outline-none focus:border-[#C9A96E] transition-colors bg-transparent cursor-pointer"
-                >
-                  <option value="Any Sanctuary">Any Sanctuary</option>
-                  <option value="Deluxe Room">Deluxe Room</option>
-                  <option value="Premier Room">Premier Room</option>
-                  <option value="Executive Suite">Executive Suite</option>
-                  <option value="Presidential Suite">Presidential Suite</option>
-                </select>
-              </div>
-              <Link
-                href="/book"
-                className="bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-6 py-3.5 text-[11px] tracking-[0.2em] uppercase font-bold text-center hover:shadow-lg hover:shadow-[#C9A96E]/40 transition-all rounded-sm flex items-center justify-center gap-1.5"
-              >
-                <span>Check Availability</span>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ===== WELCOME & HERITAGE SECTION ===== */}
-      <section className="py-20 md:py-28 bg-[#FAF7F2] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Compass className="w-4 h-4 text-[#C9A96E]" />
-                <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase font-semibold">
-                  A Heritage of Excellence
-                </p>
-              </div>
-              <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-[#0A1628] mb-4 leading-tight">
-                A Grand Landmark on Marina Beach
-              </h2>
-              <div className="w-16 h-0.5 bg-[#C9A96E] mb-8" />
-              <p className="text-[#6B6B6B] leading-relaxed mb-6 text-base">
-                Nestled along Chennai&apos;s celebrated coastline, Peninsula Chennai marries the noble heritage of South India with the refined standards of international 7-star hospitality.
-              </p>
-              <p className="text-[#6B6B6B] leading-relaxed mb-8 text-base">
-                From hand-carved Dravidian columns framing the grand lobby to rooftop infinity pools gazing over the Bay of Bengal, every moment is sculpted for royalty, dignitary visits, and discerning travelers.
-              </p>
-
-              <div className="flex items-center gap-6 mb-8 border-y border-gray-200 py-5">
-                <div>
-                  <p className="font-[var(--font-playfair)] text-2xl md:text-3xl font-bold text-[#0A1628]">250+</p>
-                  <p className="text-xs uppercase tracking-wider text-gray-500 mt-1">Luxury Rooms</p>
-                </div>
-                <div className="w-px h-12 bg-gray-200" />
-                <div>
-                  <p className="font-[var(--font-playfair)] text-2xl md:text-3xl font-bold text-[#C9A96E]">4</p>
-                  <p className="text-xs uppercase tracking-wider text-gray-500 mt-1">Signature Venues</p>
-                </div>
-                <div className="w-px h-12 bg-gray-200" />
-                <div>
-                  <p className="font-[var(--font-playfair)] text-2xl md:text-3xl font-bold text-[#0A1628]">12</p>
-                  <p className="text-xs uppercase tracking-wider text-gray-500 mt-1">Spa Pavilions</p>
-                </div>
-              </div>
-
-              <Link
-                href="/about"
-                className="inline-block border border-[#C9A96E] text-[#0A1628] px-8 py-3.5 text-[11px] tracking-[0.2em] uppercase font-bold hover:bg-[#C9A96E] hover:text-[#0A1628] transition-all rounded-sm"
-              >
-                Discover Our Heritage →
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className="relative aspect-[4/5] rounded-sm overflow-hidden shadow-2xl border-4 border-white group">
-                <Image
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"
-                  alt="Peninsula Chennai Colonnade and Grand Hall"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity" />
-              </div>
-              {/* Decorative Frame */}
-              <div className="absolute -bottom-6 -right-6 w-3/4 h-3/4 border-2 border-[#C9A96E]/40 -z-10 rounded-sm" />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== FEATURED SUITES WITH INTERACTIVE FILTER ===== */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4 font-semibold">
-              Bespoke Sanctuaries
-            </p>
-            <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-[#0A1628] mb-4">
-              Featured Rooms & Suites
+    <section className="py-24 md:py-32 bg-cream">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealOnScroll>
+          <div className="text-center mb-16">
+            <span className="section-subtitle">Guest Reviews</span>
+            <h2 className="section-title">
+              What Our <span className="italic text-gold">Guests Say</span>
             </h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto mb-4" />
-            <p className="text-[#6B6B6B] max-w-2xl mx-auto text-base">
-              Every room at Peninsula Chennai is an oasis of tranquility, featuring custom Italian linens, deep marble bathtubs, and panoramic coastline vistas.
-            </p>
-
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-              {["All", "Deluxe", "Premier", "Suite"].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveRoomCategory(cat)}
-                  className={`px-5 py-2 text-[11px] tracking-[0.2em] uppercase font-semibold transition-all rounded-sm ${activeRoomCategory === cat
-                      ? "bg-[#C9A96E] text-[#0A1628] shadow-md shadow-[#C9A96E]/30"
-                      : "border border-gray-200 text-[#6B6B6B] hover:border-[#C9A96E] hover:text-[#C9A96E]"
-                    }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeRoomCategory}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.35 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-8"
-            >
-              {filteredRooms.map((room, index) => (
-                <motion.div
-                  key={room.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Link href={`/rooms/${room.slug}`} className="group block">
-                    <div className="bg-white border border-gray-100 overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:border-[#C9A96E]/50 rounded-sm">
-                      {/* Image */}
-                      <div className="relative aspect-[16/10] overflow-hidden bg-[#0A1628]">
-                        <Image
-                          src={room.images[0]}
-                          alt={room.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/70 via-transparent to-transparent" />
-                        <div className="absolute top-4 left-4 bg-[#C9A96E] text-[#0A1628] px-3 py-1 text-[10px] tracking-[0.2em] uppercase font-semibold shadow-md">
-                          {room.category}
-                        </div>
-                        <div className="absolute bottom-4 left-4 text-white text-xs tracking-wider font-light">
-                          {room.view} • {room.size}
-                        </div>
-                      </div>
-                      <div className="p-6 md:p-8">
-                        <h3 className="font-[var(--font-playfair)] text-2xl text-[#0A1628] mb-2 group-hover:text-[#C9A96E] transition-colors">
-                          {room.name}
-                        </h3>
-                        <p className="text-[#6B6B6B] text-sm mb-6 line-clamp-2 leading-relaxed">
-                          {room.shortDescription}
-                        </p>
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                          <div>
-                            <span className="text-[#C9A96E] font-[var(--font-playfair)] text-2xl font-bold">
-                              {formatCurrency(room.price)}
-                            </span>
-                            <span className="text-[#6B6B6B] text-xs"> / night</span>
-                          </div>
-                          <span className="text-[11px] tracking-[0.15em] uppercase text-[#0A1628] font-bold group-hover:text-[#C9A96E] group-hover:translate-x-1 transition-all">
-                            Explore Sanctuary →
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
-
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mt-12">
-            <Link
-              href="/rooms"
-              className="inline-block border border-[#C9A96E] text-[#0A1628] px-10 py-3.5 text-[11px] tracking-[0.2em] uppercase font-bold hover:bg-[#C9A96E] hover:text-[#0A1628] transition-all rounded-sm"
-            >
-              View All Room Categories →
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ===== CURATED EXPERIENCES / MOMENTS (NEW PREMIUM STRIP) ===== */}
-      <section className="py-20 md:py-28 bg-[#0A1628] text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center gap-2 mb-3">
-              <Waves className="w-4 h-4 text-[#C9A96E]" />
-              <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase font-semibold">
-                Unrivalled Hospitality
-              </p>
-            </div>
-            <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-white mb-4">
-              Curated Peninsula Moments
-            </h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto mb-4" />
-            <p className="text-white/70 max-w-2xl mx-auto text-base">
-              Immerse yourself in hand-crafted experiences designed exclusively for guests of Peninsula Chennai.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {experiences.map((exp, index) => (
-              <motion.div
-                key={exp.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.12 }}
-                className="group relative overflow-hidden rounded-sm bg-white/5 border border-white/10 hover:border-[#C9A96E]/50 transition-all duration-500 hover:shadow-2xl hover:shadow-[#C9A96E]/10"
-              >
-                <div className="aspect-[4/3] relative overflow-hidden">
-                  <Image
-                    src={exp.image}
-                    alt={exp.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/30 to-transparent" />
-                  <span className="absolute top-3 left-3 bg-[#C9A96E] text-[#0A1628] text-[9px] tracking-wider uppercase px-2.5 py-0.5 font-bold">
-                    {exp.tag}
-                  </span>
-                </div>
-                <div className="p-6">
-                  <p className="text-[#C9A96E] text-[10px] tracking-[0.2em] uppercase font-semibold mb-1">
-                    {exp.subtitle}
-                  </p>
-                  <h3 className="font-[var(--font-playfair)] text-xl text-white mb-3 group-hover:text-[#C9A96E] transition-colors">
-                    {exp.title}
-                  </h3>
-                  <p className="text-white/70 text-xs leading-relaxed">
-                    {exp.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
           </div>
-        </div>
-      </section>
+        </RevealOnScroll>
 
-      {/* ===== DINING HIGHLIGHTS WITH EDITORIAL GASTRONOMY ===== */}
-      <section className="py-20 md:py-28 bg-[#FAF7F2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4 font-medium">Fine Dining & Lounge</p>
-            <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-[#0A1628] mb-4">
-              Epicurean Journeys
-            </h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto mb-4" />
-            <p className="text-[#6B6B6B] max-w-2xl mx-auto text-base">
-              Four curated culinary destinations celebrating Tamil spice routes, theatre pan-Asian cuisine, all-day veranda dining, and rare single malts.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {diningVenues.map((venue, index) => (
-              <motion.div
-                key={venue.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <Link href="/dining" className="group block">
-                  <div className="bg-white overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 rounded-sm border border-gray-100 hover:border-[#C9A96E]/40">
-                    <div className="aspect-[3/4] relative overflow-hidden bg-[#0A1628]">
-                      <Image
-                        src={venue.image}
-                        alt={venue.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/20 to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <p className="text-[#C9A96E] text-[10px] tracking-[0.2em] uppercase mb-1 font-semibold">
-                          {venue.cuisine}
-                        </p>
-                        <h3 className="font-[var(--font-playfair)] text-white text-xl">
-                          {venue.name}
-                        </h3>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <p className="text-[#6B6B6B] text-xs line-clamp-2 mb-3 leading-relaxed">
-                        {venue.shortDescription}
-                      </p>
-                      <p className="text-[10px] text-[#9A9A9A] tracking-wider uppercase font-medium">
-                        {venue.operatingHours}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== SPA & WELLNESS WITH SANCTUARY PHOTOGRAPHY ===== */}
-      <section className="py-20 md:py-28 bg-[#0A1628] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4 font-semibold">
-                Holistic Rejuvenation
-              </p>
-              <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-white mb-4">
-                The Peninsula Spa
-              </h2>
-              <div className="w-16 h-0.5 bg-[#C9A96E] mb-8" />
-              <p className="text-white/70 leading-relaxed mb-6 text-base">
-                Surrender to serenity in our award-winning wellness retreat. Guided by centuries-old Ayurvedic traditions, Swedish deep-tissue philosophies, and 24K gold facials.
-              </p>
-              <p className="text-white/70 leading-relaxed mb-8 text-base">
-                Featuring 12 private therapy suites, vitality pools, herbal steam grottos, and an open Zen meditation courtyard.
-              </p>
-              <Link
-                href="/spa"
-                className="inline-block bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-8 py-3.5 text-[11px] tracking-[0.2em] uppercase font-bold hover:shadow-2xl transition-all rounded-sm"
-              >
-                View Spa Treatments →
-              </Link>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="aspect-[4/3] relative overflow-hidden shadow-2xl border-2 border-[#C9A96E]/30 rounded-sm group">
-                <Image
-                  src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80"
-                  alt="The Peninsula Spa Sanctuary"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== STATS STRIP ===== */}
-      <section className="py-16 bg-white border-y border-[#C9A96E]/20">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { number: 250, suffix: "+", label: "Luxury Suites", icon: BedDouble },
-              { number: 4, suffix: "", label: "Fine Dining Venues", icon: UtensilsCrossed },
-              { number: 15, suffix: "+", label: "Spa Treatments", icon: Sparkles },
-              { number: 800, suffix: "", label: "Grand Gala Capacity", icon: Users },
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="flex flex-col items-center"
-              >
-                <stat.icon className="w-6 h-6 text-[#C9A96E] mb-3" />
-                <span className="font-[var(--font-playfair)] text-3xl md:text-4xl text-[#0A1628] mb-1 font-bold">
-                  <AnimatedCounter target={stat.number} suffix={stat.suffix} />
-                </span>
-                <span className="text-[#6B6B6B] text-xs tracking-[0.15em] uppercase font-medium">
-                  {stat.label}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== TESTIMONIALS WITH SLIDER CONTROLS ===== */}
-      <section className="py-20 md:py-28 bg-[#FAF7F2]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4 font-semibold">Guest Accolades</p>
-            <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-[#0A1628] mb-4">
-              Stories of Magnificence
-            </h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto" />
-          </motion.div>
-
-          <div className="relative">
-            {/* Arrows */}
-            <button
-              onClick={() =>
-                setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-              }
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 p-2 rounded-full border border-gray-300 hover:border-[#C9A96E] text-[#0A1628] hover:text-[#C9A96E] transition-all bg-white shadow-sm z-10"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <button
-              onClick={() =>
-                setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-              }
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 p-2 rounded-full border border-gray-300 hover:border-[#C9A96E] text-[#0A1628] hover:text-[#C9A96E] transition-all bg-white shadow-sm z-10"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-
+        <RevealOnScroll delay={0.2}>
+          <div className="relative min-h-[250px]">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentTestimonial}
+                key={current}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-                className="text-center px-6"
+                transition={{ duration: 0.5 }}
+                className="text-center"
               >
-                <Quote className="w-10 h-10 text-[#C9A96E]/40 mx-auto mb-6" />
-                <p className="font-[var(--font-playfair)] text-xl md:text-2xl text-[#0A1628] leading-relaxed mb-8 italic font-light">
-                  &ldquo;{testimonials[currentTestimonial].content}&rdquo;
-                </p>
-                <div className="flex items-center justify-center gap-1 mb-3">
-                  {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-[#C9A96E] fill-[#C9A96E]" />
+                {/* Stars */}
+                <div className="flex items-center justify-center gap-1 mb-6">
+                  {Array.from({ length: testimonials[current].rating }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-gold text-gold" />
                   ))}
                 </div>
-                <p className="text-[#0A1628] font-bold text-sm tracking-wide">
-                  {testimonials[currentTestimonial].guestName}
-                </p>
-                <p className="text-[#6B6B6B] text-xs tracking-wider">
-                  {testimonials[currentTestimonial].guestTitle}
-                </p>
-              </motion.div>
-            </AnimatePresence>
 
-            {/* Navigation Dots */}
-            <div className="flex items-center justify-center gap-3 mt-10">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentTestimonial(i)}
-                  className={`h-2 rounded-full transition-all ${i === currentTestimonial ? "bg-[#C9A96E] w-8" : "bg-[#0A1628]/20 w-2"
-                    }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+                {/* Quote */}
+                <blockquote className="text-lg md:text-xl text-navy/80 leading-relaxed mb-8 font-light italic font-playfair">
+                  &ldquo;{testimonials[current].content}&rdquo;
+                </blockquote>
 
-      {/* ===== EXCLUSIVE OFFERS WITH PHOTO TILES ===== */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4 font-semibold">Bespoke Privileges</p>
-            <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl text-[#0A1628] mb-4">
-              Seasonal Offers & Experiences
-            </h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto" />
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {offers.map((offer, index) => (
-              <motion.div
-                key={offer.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                className="group"
-              >
-                <div className="bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:border-[#C9A96E]/50 rounded-sm">
-                  <div className="relative aspect-[16/9] overflow-hidden bg-[#0A1628]">
-                    <Image
-                      src={offer.image}
-                      alt={offer.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute top-4 right-4 bg-[#C9A96E] text-[#0A1628] px-3 py-1 text-xs font-bold shadow-md">
-                      {offer.discountValue}% OFF
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-[var(--font-playfair)] text-xl text-[#0A1628] mb-2 font-bold group-hover:text-[#C9A96E] transition-colors">
-                      {offer.title}
-                    </h3>
-                    <p className="text-[#6B6B6B] text-sm mb-6 line-clamp-2">
-                      {offer.shortDescription}
-                    </p>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <code className="text-[#0A1628] text-xs bg-[#C9A96E]/20 px-3 py-1 font-mono font-bold">
-                        {offer.promoCode}
-                      </code>
-                      <Link
-                        href="/offers"
-                        className="text-[11px] tracking-[0.15em] uppercase text-[#C9A96E] font-bold group-hover:translate-x-1 transition-transform"
-                      >
-                        Claim Offer →
-                      </Link>
-                    </div>
-                  </div>
+                {/* Guest Info */}
+                <div>
+                  <p className="text-navy font-semibold text-sm">{testimonials[current].guestName}</p>
+                  <p className="text-navy/40 text-xs tracking-wider">{testimonials[current].guestTitle}</p>
                 </div>
               </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Dots */}
+          <div className="flex items-center justify-center gap-2 mt-8">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrent(index)}
+                className={`transition-all duration-300 rounded-full ${
+                  index === current
+                    ? "w-8 h-2 bg-gold"
+                    : "w-2 h-2 bg-navy/20 hover:bg-gold/50"
+                }`}
+              />
             ))}
           </div>
-        </div>
-      </section>
+        </RevealOnScroll>
+      </div>
+    </section>
+  );
+}
 
-      {/* ===== NEWSLETTER CTA ===== */}
-      <section className="py-20 md:py-28 bg-[#0A1628] relative overflow-hidden text-center text-white">
-        <div className="max-w-2xl mx-auto px-4 relative z-10">
-          <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-3 font-semibold">
-            The Peninsula Connoisseur
-          </p>
-          <h2 className="font-[var(--font-playfair)] text-3xl md:text-5xl mb-4">
-            Receive Curated Invitations
+// ===== LOCATION SECTION =====
+function LocationSection() {
+  return (
+    <section className="py-24 md:py-32 bg-warm-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Map / Image placeholder */}
+          <RevealOnScroll direction="left">
+            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-cream relative">
+              <Image
+                src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80"
+                alt="Hotel Peninsula Location"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-navy/30 flex items-center justify-center">
+                <div className="glass rounded-2xl px-8 py-6 text-center">
+                  <MapPin className="w-8 h-8 text-gold mx-auto mb-2" />
+                  <p className="text-white font-playfair text-lg">T. Nagar, Chennai</p>
+                  <p className="text-white/60 text-xs mt-1">Heart of the City</p>
+                </div>
+              </div>
+            </div>
+          </RevealOnScroll>
+
+          {/* Content */}
+          <RevealOnScroll direction="right" delay={0.2}>
+            <span className="section-subtitle">Location</span>
+            <h2 className="section-title">
+              In the Heart of <span className="italic text-gold">Chennai</span>
+            </h2>
+            <div className="luxury-divider-left" />
+            <p className="text-charcoal/60 text-base leading-relaxed mb-8">
+              Located on the prestigious G. N. Chetty Road in T. Nagar, Hotel Peninsula 
+              places you at the center of Chennai&apos;s most popular shopping and cultural district.
+            </p>
+
+            <div className="space-y-4 mb-8">
+              {hotelInfo.nearbyAttractions.slice(0, 6).map((attraction) => (
+                <div key={attraction.name} className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-navy/70 text-sm">{attraction.name}</span>
+                  <span className="text-gold text-sm font-medium">{attraction.distance}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <Link href="/contact" className="btn-gold rounded-full inline-flex items-center gap-2">
+                Get Directions <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <a href={`tel:${hotelInfo.mobile.replace(/[- ]/g, '')}`} className="btn-outline-gold rounded-full !border-navy/20 !text-navy hover:!bg-navy hover:!text-white hover:!border-navy inline-flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5" /> Call Us
+              </a>
+            </div>
+          </RevealOnScroll>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== CTA SECTION =====
+function CTASection() {
+  return (
+    <section className="relative py-32 overflow-hidden">
+      <div className="absolute inset-0">
+        <Image
+          src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=2000&q=80"
+          alt="Luxury Room"
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-navy/80" />
+      </div>
+
+      <div className="relative z-10 max-w-3xl mx-auto px-4 text-center">
+        <RevealOnScroll>
+          <Sparkles className="w-8 h-8 text-gold mx-auto mb-6" />
+          <h2 className="font-playfair text-4xl md:text-5xl lg:text-6xl text-white font-light leading-tight mb-6">
+            Ready to Experience
+            <br />
+            <span className="italic text-gold">True Hospitality?</span>
           </h2>
-          <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto mb-6" />
-          <p className="text-white/70 mb-8 text-sm">
-            Be the first to receive invitations to winemaker dinners, seasonal suite promotions, and private cultural exhibitions at Peninsula Chennai.
+          <p className="text-white/50 text-base mb-10 max-w-md mx-auto">
+            Book direct for the best rates and enjoy complimentary breakfast with every stay.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="flex-1 bg-white/10 border border-white/20 px-5 py-3.5 text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-[#C9A96E] transition-colors rounded-sm"
-            />
-            <button className="bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-8 py-3.5 text-[11px] tracking-[0.2em] uppercase font-bold hover:shadow-lg transition-all rounded-sm">
-              Subscribe
-            </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/book" className="btn-gold rounded-full">
+              Book Your Stay
+            </Link>
+            <a
+              href={`tel:${hotelInfo.mobile.replace(/[- ]/g, '')}`}
+              className="btn-outline-gold rounded-full !border-white/30 !text-white hover:!bg-white hover:!text-navy hover:!border-white inline-flex items-center gap-2"
+            >
+              <Phone className="w-3.5 h-3.5" /> {hotelInfo.mobile}
+            </a>
           </div>
-        </div>
-      </section>
+        </RevealOnScroll>
+      </div>
+    </section>
+  );
+}
 
-      {/* ===== FLOATING BACK TO TOP BUTTON ===== */}
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-40 bg-[#0A1628] text-[#C9A96E] border border-[#C9A96E]/50 p-3.5 rounded-full shadow-2xl hover:bg-[#C9A96E] hover:text-[#0A1628] transition-all duration-300 hover:-translate-y-1 group"
-            aria-label="Back to top"
-          >
-            <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </>
+// ===== MAIN HOME PAGE =====
+export default function HomePage() {
+  return (
+    <main>
+      <HeroSection />
+      <QuickBooking />
+      <AboutSection />
+      <RoomsSection />
+      <StatsSection />
+      <DiningSection />
+      <ServicesSection />
+      <TestimonialsSection />
+      <LocationSection />
+      <CTASection />
+    </main>
   );
 }

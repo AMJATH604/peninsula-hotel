@@ -1,188 +1,169 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Users, Maximize, Check, Send } from "lucide-react";
-import { eventVenues } from "@/lib/data";
+import { motion, useInView } from "framer-motion";
+import { Users, Maximize, Check, Send, ArrowRight } from "lucide-react";
+import { eventVenues, hotelInfo } from "@/lib/data";
+
+function RevealOnScroll({ children, delay = 0, direction = "up", className = "" }: {
+  children: React.ReactNode; delay?: number; direction?: "up" | "left" | "right" | "scale"; className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const variants = {
+    up: { hidden: { opacity: 0, y: 60 }, visible: { opacity: 1, y: 0 } },
+    left: { hidden: { opacity: 0, x: -60 }, visible: { opacity: 1, x: 0 } },
+    right: { hidden: { opacity: 0, x: 60 }, visible: { opacity: 1, x: 0 } },
+    scale: { hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } },
+  };
+  return (
+    <motion.div ref={ref} initial="hidden" animate={isInView ? "visible" : "hidden"} variants={variants[direction]}
+      transition={{ duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
 
 export default function EventsPage() {
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", eventType: "Wedding", date: "", guests: "", message: "" });
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.name || !formData.email) return;
-
-    setLoading(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          subject: `${formData.eventType} Proposal Request`,
-          message: `Event Date: ${formData.date || "TBD"}, Guests: ${formData.guests || "TBD"}\nDetails: ${formData.message}`,
-          type: "event",
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSubmitted(true);
-        setFormData({ name: "", email: "", phone: "", eventType: "Wedding", date: "", guests: "", message: "" });
-      }
-    } catch {
-      alert("Failed to submit inquiry");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <>
+    <main>
       {/* Hero */}
-      <section className="relative h-[55vh] flex items-center justify-center overflow-hidden">
-        <Image
-          src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1920&q=80"
-          alt="Peninsula Chennai Events & Weddings"
-          fill
-          priority
-          className="object-cover brightness-[0.35]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-transparent to-[#0A1628]/60" />
-        <div className="relative z-10 text-center px-4 max-w-3xl">
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4">Celebrations & Conferences</motion.p>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="font-[var(--font-playfair)] text-4xl md:text-6xl text-white mb-4">Events & Weddings</motion.h1>
-          <motion.div initial={{ width: 0 }} animate={{ width: 80 }} transition={{ duration: 0.8, delay: 0.3 }} className="h-px bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent mx-auto mb-4" />
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="text-white/80 text-lg font-[var(--font-playfair)] italic">Where Grand Milestones Become Timeless Memories</motion.p>
+      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
+        <Image src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=2000&q=80" alt="Events" fill priority className="object-cover" sizes="100vw" />
+        <div className="hero-overlay absolute inset-0" />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+          <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-[11px] tracking-[0.4em] uppercase text-gold font-medium mb-4">Celebrations</motion.span>
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="font-playfair text-4xl md:text-6xl text-white font-light">
+            Events & <span className="italic text-gold">Weddings</span>
+          </motion.h1>
+        </div>
+      </section>
+
+      {/* Intro */}
+      <section className="py-20 bg-warm-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <RevealOnScroll>
+            <p className="text-charcoal/60 text-lg leading-relaxed font-light">
+              From grand weddings and receptions to corporate conferences and intimate celebrations, 
+              Hotel Peninsula provides elegant venues and professional event management in the heart of 
+              T. Nagar, Chennai.
+            </p>
+          </RevealOnScroll>
         </div>
       </section>
 
       {/* Venues */}
-      <section className="py-16 md:py-24 bg-[#FAF7F2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="font-[var(--font-playfair)] text-3xl md:text-4xl text-[#0A1628] mb-4">Our Venues</h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto mb-4" />
-            <p className="text-[#6B6B6B] max-w-2xl mx-auto">From intimate boardroom summits to 800-guest fairy tale weddings, our versatile venues provide the quintessential luxury setting.</p>
-          </div>
+      {eventVenues.map((venue, index) => (
+        <section key={venue.id} className={`py-20 md:py-28 ${index % 2 === 0 ? "bg-cream" : "bg-warm-white"}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <RevealOnScroll direction={index % 2 === 0 ? "left" : "right"}>
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                  <Image src={venue.image} alt={venue.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                </div>
+              </RevealOnScroll>
 
-          <div className="space-y-16">
-            {eventVenues.map((venue, index) => (
-              <motion.div
-                key={venue.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
-                className="bg-white border border-gray-100 overflow-hidden shadow-xl rounded-sm group"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-2">
-                  <div className="relative aspect-[16/10] lg:aspect-auto bg-[#0A1628] overflow-hidden min-h-[320px]">
-                    <Image
-                      src={venue.image}
-                      alt={venue.name}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/60 via-transparent to-transparent opacity-60" />
-                    <div className="absolute top-4 left-4 bg-[#C9A96E] text-[#0A1628] px-3 py-1 text-[10px] tracking-[0.2em] uppercase font-semibold shadow-md">
-                      Capacity: {venue.capacity}
-                    </div>
+              <RevealOnScroll direction={index % 2 === 0 ? "right" : "left"} delay={0.15} className={index % 2 === 1 ? "lg:order-first" : ""}>
+                <h2 className="font-playfair text-3xl md:text-4xl text-navy mb-4">{venue.name}</h2>
+                <div className="luxury-divider-left" />
+                <p className="text-charcoal/60 text-base leading-relaxed mb-6">{venue.description}</p>
+
+                <div className="flex items-center gap-6 mb-6">
+                  <div className="flex items-center gap-2 text-sm text-navy/60">
+                    <Users className="w-4 h-4 text-gold" />
+                    Up to {venue.capacity} guests
                   </div>
-                  <div className="p-8 md:p-12">
-                    <h3 className="font-[var(--font-playfair)] text-2xl md:text-3xl text-[#0A1628] mb-3">{venue.name}</h3>
-                    <div className="w-12 h-0.5 bg-[#C9A96E] mb-6" />
-                    <p className="text-[#6B6B6B] leading-relaxed mb-6 text-sm md:text-base">{venue.description}</p>
-                    <div className="flex flex-wrap gap-6 mb-6">
-                      <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
-                        <Users className="w-4 h-4 text-[#C9A96E]" /> Up to {venue.capacity} guests
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
-                        <Maximize className="w-4 h-4 text-[#C9A96E]" /> {venue.size}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {venue.features.map((f) => (
-                        <span key={f} className="flex items-center gap-1.5 text-xs text-[#0A1628] bg-[#FAF7F2] px-3 py-1.5 border border-gray-100">
-                          <Check className="w-3 h-3 text-[#C9A96E]" /> {f}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {venue.suitableFor.map((s) => (
-                        <span key={s} className="text-[10px] tracking-[0.1em] uppercase text-[#0A1628] bg-[#C9A96E]/15 border border-[#C9A96E]/30 px-3 py-1 font-medium">{s}</span>
-                      ))}
-                    </div>
+                  <div className="flex items-center gap-2 text-sm text-navy/60">
+                    <Maximize className="w-4 h-4 text-gold" />
+                    {venue.size}
                   </div>
                 </div>
-              </motion.div>
-            ))}
+
+                <div className="mb-6">
+                  <h4 className="text-[10px] tracking-[0.15em] uppercase text-navy/40 font-medium mb-3">Features</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {venue.features.map((f) => (
+                      <div key={f} className="flex items-center gap-2 text-sm text-navy/60">
+                        <Check className="w-3.5 h-3.5 text-gold flex-shrink-0" /> {f}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-8">
+                  <h4 className="text-[10px] tracking-[0.15em] uppercase text-navy/40 font-medium mb-3">Ideal For</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {venue.suitableFor.map((s) => (
+                      <span key={s} className="text-[10px] tracking-wider uppercase bg-gold/10 text-gold rounded-full px-4 py-1.5 font-medium">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              </RevealOnScroll>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ))}
 
       {/* Inquiry Form */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-20 md:py-28 bg-navy">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-[var(--font-playfair)] text-3xl text-[#0A1628] mb-4">Request a Proposal</h2>
-            <div className="w-16 h-0.5 bg-[#C9A96E] mx-auto mb-4" />
-            <p className="text-[#6B6B6B]">Tell us about your event and our dedicated team will craft a bespoke proposal.</p>
-          </div>
-
-          {submitted ? (
-            <div className="bg-[#FAF7F2] border border-[#C9A96E]/30 p-8 text-center rounded-lg">
-              <p className="text-[#C9A96E] font-semibold text-lg mb-2">Proposal Request Received</p>
-              <p className="text-gray-600 text-sm mb-6">Our banquet and events concierge will review your date and requirements and respond with a customized luxury package.</p>
-              <button onClick={() => setSubmitted(false)} className="border border-[#C9A96E] text-[#C9A96E] px-6 py-2.5 text-xs tracking-wider uppercase font-semibold hover:bg-[#C9A96E] hover:text-[#0A1628]">Request Another Event</button>
+          <RevealOnScroll>
+            <div className="text-center mb-12">
+              <span className="section-subtitle">Get in Touch</span>
+              <h2 className="section-title-white">Plan Your <span className="italic text-gold">Event</span></h2>
+              <p className="text-white/40 text-sm">Fill out the form below and our events team will get back to you within 24 hours.</p>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          </RevealOnScroll>
+
+          <RevealOnScroll delay={0.2}>
+            <div className="bg-white/5 rounded-2xl p-8 border border-white/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Full Name *</label>
-                  <input required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} type="text" className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2]" placeholder="Your name" />
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Name</label>
+                  <input type="text" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-gold transition-colors" placeholder="Your full name" />
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Email *</label>
-                  <input required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} type="email" className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2]" placeholder="Your email" />
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Email</label>
+                  <input type="email" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-gold transition-colors" placeholder="your@email.com" />
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Phone</label>
-                  <input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} type="tel" className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2]" placeholder="Your phone" />
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Phone</label>
+                  <input type="tel" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-gold transition-colors" placeholder="+91 XXXXX XXXXX" />
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Event Type</label>
-                  <select value={formData.eventType} onChange={(e) => setFormData({ ...formData, eventType: e.target.value })} className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2]">
-                    <option>Wedding</option><option>Corporate Gala</option><option>Conference</option><option>Private Celebration</option><option>Product Launch</option>
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Event Type</label>
+                  <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-gold transition-colors appearance-none">
+                    <option value="">Select event type</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="reception">Reception</option>
+                    <option value="corporate">Corporate Event</option>
+                    <option value="conference">Conference / Seminar</option>
+                    <option value="birthday">Birthday Party</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Preferred Date</label>
-                  <input value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} type="date" className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2]" />
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Event Date</label>
+                  <input type="date" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-gold transition-colors" />
                 </div>
                 <div>
-                  <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Number of Guests</label>
-                  <input value={formData.guests} onChange={(e) => setFormData({ ...formData, guests: e.target.value })} type="number" className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2]" placeholder="Expected guests" />
+                  <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Expected Guests</label>
+                  <input type="number" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-gold transition-colors" placeholder="Number of guests" />
                 </div>
               </div>
-              <div>
-                <label className="text-[10px] tracking-[0.2em] uppercase text-[#6B6B6B] mb-2 block">Additional Details</label>
-                <textarea rows={4} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#C9A96E] transition-colors bg-[#FAF7F2] resize-none" placeholder="Tell us more about your event..." />
+              <div className="mb-6">
+                <label className="text-[10px] tracking-[0.15em] uppercase text-white/40 font-medium mb-2 block">Additional Details</label>
+                <textarea rows={4} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 text-sm outline-none focus:border-gold transition-colors resize-none" placeholder="Tell us about your event..." />
               </div>
-              <button disabled={loading} type="submit" className="w-full md:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-10 py-3.5 text-[11px] tracking-[0.2em] uppercase font-semibold hover:shadow-lg hover:shadow-[#C9A96E]/30 transition-all disabled:opacity-50">
-                <Send className="w-4 h-4" /> {loading ? "Submitting..." : "Submit Inquiry"}
+              <button className="btn-gold rounded-full w-full flex items-center justify-center gap-2">
+                <Send className="w-4 h-4" /> Submit Inquiry
               </button>
-            </form>
-          )}
+            </div>
+          </RevealOnScroll>
         </div>
       </section>
-    </>
+    </main>
   );
 }
-

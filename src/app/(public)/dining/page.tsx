@@ -1,99 +1,102 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Clock, Shirt } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { Clock, Utensils, ArrowRight } from "lucide-react";
 import { diningVenues } from "@/lib/data";
+
+function RevealOnScroll({ children, delay = 0, direction = "up", className = "" }: {
+  children: React.ReactNode; delay?: number; direction?: "up" | "left" | "right" | "scale"; className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const variants = {
+    up: { hidden: { opacity: 0, y: 60 }, visible: { opacity: 1, y: 0 } },
+    left: { hidden: { opacity: 0, x: -60 }, visible: { opacity: 1, x: 0 } },
+    right: { hidden: { opacity: 0, x: 60 }, visible: { opacity: 1, x: 0 } },
+    scale: { hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } },
+  };
+  return (
+    <motion.div ref={ref} initial="hidden" animate={isInView ? "visible" : "hidden"} variants={variants[direction]}
+      transition={{ duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
 
 export default function DiningPage() {
   return (
-    <>
+    <main>
       {/* Hero */}
-      <section className="relative h-[55vh] flex items-center justify-center overflow-hidden">
-        <Image
-          src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80"
-          alt="Peninsula Chennai Dining"
-          fill
-          priority
-          className="object-cover brightness-[0.35]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-transparent to-[#0A1628]/60" />
-        <div className="relative z-10 text-center px-4 max-w-3xl">
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-4">Gastronomy & Libations</motion.p>
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="font-[var(--font-playfair)] text-4xl md:text-6xl text-white mb-4">Culinary Excellence</motion.h1>
-          <motion.div initial={{ width: 0 }} animate={{ width: 80 }} transition={{ duration: 0.8, delay: 0.3 }} className="h-px bg-gradient-to-r from-transparent via-[#C9A96E] to-transparent mx-auto mb-4" />
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }} className="text-white/80 text-lg font-[var(--font-playfair)] italic">Michelin-Trained Chefs, Coastal Seafood & Heritage Flavours</motion.p>
+      <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
+        <Image src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=80" alt="Dining" fill priority className="object-cover" sizes="100vw" />
+        <div className="hero-overlay absolute inset-0" />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+          <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-[11px] tracking-[0.4em] uppercase text-gold font-medium mb-4">Culinary</motion.span>
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="font-playfair text-4xl md:text-6xl text-white font-light">
+            Dining & <span className="italic text-gold">Cuisine</span>
+          </motion.h1>
         </div>
       </section>
 
-      {/* Dining Venues */}
-      <section className="py-16 md:py-24 bg-[#FAF7F2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {diningVenues.map((venue, index) => (
-            <motion.div
-              key={venue.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className={`bg-white border border-gray-100 shadow-md overflow-hidden rounded-sm grid grid-cols-1 lg:grid-cols-2 gap-0 items-center mb-16 last:mb-0 group ${
-                index % 2 === 1 ? "lg:flex-row-reverse" : ""
-              }`}
-            >
+      {/* Intro */}
+      <section className="py-20 bg-warm-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <RevealOnScroll>
+            <p className="text-charcoal/60 text-lg leading-relaxed font-light">
+              From aromatic filter coffee at dawn to sumptuous Chettinad feasts, Hotel Peninsula celebrates 
+              the rich culinary heritage of South India. Our restaurants offer authentic flavors crafted 
+              with the freshest ingredients and time-honored recipes.
+            </p>
+          </RevealOnScroll>
+        </div>
+      </section>
+
+      {/* Restaurants */}
+      {diningVenues.map((venue, index) => (
+        <section key={venue.id} className={`py-20 md:py-28 ${index % 2 === 0 ? "bg-cream" : "bg-warm-white"}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${index % 2 === 1 ? "lg:flex-row-reverse" : ""}`}>
               {/* Image */}
-              <div className={`relative aspect-[4/3] lg:aspect-auto lg:h-full min-h-[360px] bg-[#0A1628] overflow-hidden ${index % 2 === 1 ? "lg:order-2" : ""}`}>
-                <Image
-                  src={venue.image}
-                  alt={venue.name}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628]/60 via-transparent to-transparent opacity-50" />
-                <div className="absolute top-4 left-4 bg-[#C9A96E] text-[#0A1628] px-3 py-1 text-[10px] tracking-[0.2em] uppercase font-semibold shadow-md">
-                  {venue.cuisine}
+              <RevealOnScroll direction={index % 2 === 0 ? "left" : "right"}>
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+                  <Image src={venue.image} alt={venue.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
-              </div>
+              </RevealOnScroll>
 
               {/* Content */}
-              <div className={`p-8 md:p-12 ${index % 2 === 1 ? "lg:order-1" : ""}`}>
-                <p className="text-[#C9A96E] text-xs tracking-[0.3em] uppercase mb-2 font-medium">{venue.cuisine}</p>
-                <h2 className="font-[var(--font-playfair)] text-3xl md:text-4xl text-[#0A1628] mb-4">{venue.name}</h2>
-                <div className="w-12 h-0.5 bg-[#C9A96E] mb-6" />
-                <p className="text-[#6B6B6B] leading-relaxed mb-6 text-base">{venue.description}</p>
+              <RevealOnScroll direction={index % 2 === 0 ? "right" : "left"} delay={0.15} className={index % 2 === 1 ? "lg:order-first" : ""}>
+                <span className="text-[10px] tracking-[0.2em] uppercase text-gold font-medium">{venue.cuisine}</span>
+                <h2 className="font-playfair text-3xl md:text-4xl text-navy mt-2 mb-4">{venue.name}</h2>
+                <div className="luxury-divider-left" />
+                <p className="text-charcoal/60 text-base leading-relaxed mb-6">{venue.description}</p>
 
-                <div className="flex flex-wrap gap-6 mb-6 text-sm">
-                  <div className="flex items-center gap-2 text-[#6B6B6B]">
-                    <Clock className="w-4 h-4 text-[#C9A96E]" />
-                    {venue.operatingHours}
-                  </div>
-                  <div className="flex items-center gap-2 text-[#6B6B6B]">
-                    <Shirt className="w-4 h-4 text-[#C9A96E]" />
-                    {venue.dressCode}
-                  </div>
+                <div className="flex items-center gap-2 text-sm text-navy/50 mb-4">
+                  <Clock className="w-4 h-4 text-gold" />
+                  <span>{venue.operatingHours}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-navy/50 mb-6">
+                  <Utensils className="w-4 h-4 text-gold" />
+                  <span>Dress Code: {venue.dressCode}</span>
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-8">
                   {venue.highlights.map((h) => (
-                    <span key={h} className="text-[10px] tracking-[0.1em] uppercase text-[#0A1628] bg-[#FAF7F2] border border-[#C9A96E]/30 px-3 py-1.5 font-medium">
-                      {h}
-                    </span>
+                    <span key={h} className="text-[10px] tracking-wider uppercase text-navy/50 bg-white rounded-full px-4 py-1.5 border border-gray-100">{h}</span>
                   ))}
                 </div>
 
-                <Link
-                  href="/contact"
-                  className="inline-block bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-8 py-3.5 text-[11px] tracking-[0.2em] uppercase font-semibold hover:shadow-lg hover:shadow-[#C9A96E]/30 transition-all"
-                >
-                  Reserve a Table
+                <Link href="/contact" className="btn-gold rounded-full inline-flex items-center gap-2">
+                  Reserve a Table <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-    </>
+              </RevealOnScroll>
+            </div>
+          </div>
+        </section>
+      ))}
+    </main>
   );
 }
-

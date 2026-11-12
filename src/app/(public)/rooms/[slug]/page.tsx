@@ -1,214 +1,249 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { BedDouble, Users, Maximize, Eye, Layers, Check, ArrowLeft } from "lucide-react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowRight, Check, Users, Maximize, BedDouble, Eye, MapPin, Star } from "lucide-react";
 import { rooms } from "@/lib/data";
-import { formatCurrency } from "@/lib/utils";
-import { notFound } from "next/navigation";
 import { use } from "react";
+
+function RevealOnScroll({ children, delay = 0, className = "" }: {
+  children: React.ReactNode; delay?: number; className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  return (
+    <motion.div ref={ref} initial={{ opacity: 0, y: 60 }} animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
+      transition={{ duration: 0.8, delay, ease: [0.25, 0.46, 0.45, 0.94] }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
 
 export default function RoomDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const room = rooms.find((r) => r.slug === slug);
+  const [activeImage, setActiveImage] = useState(0);
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  if (!room) {
+    return (
+      <main className="min-h-screen flex items-center justify-center pt-32">
+        <div className="text-center">
+          <h1 className="font-playfair text-3xl text-navy mb-4">Room Not Found</h1>
+          <Link href="/rooms" className="btn-gold rounded-full">View All Rooms</Link>
+        </div>
+      </main>
+    );
+  }
 
-  if (!room) return notFound();
-
-  const activeMainImage = selectedImage || room.images[0];
-  const similarRooms = rooms.filter((r) => r.id !== room.id).slice(0, 2);
+  const otherRooms = rooms.filter((r) => r.id !== room.id).slice(0, 2);
 
   return (
-    <>
-      {/* Hero */}
-      <section className="relative h-[65vh] flex items-end overflow-hidden">
-        <Image
-          src={room.images[0]}
-          alt={room.name}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover brightness-[0.45]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/40 to-transparent" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 w-full">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <Link href="/rooms" className="inline-flex items-center gap-2 text-[#C9A96E] text-xs tracking-[0.2em] uppercase mb-4 hover:text-[#D4BC8E] transition-colors">
-              <ArrowLeft className="w-4 h-4" /> Back to Rooms
-            </Link>
-            <div>
-              <span className="bg-[#C9A96E] text-[#0A1628] px-3 py-1 text-[10px] tracking-[0.2em] uppercase font-semibold">
-                {room.category}
-              </span>
-            </div>
-            <h1 className="font-[var(--font-playfair)] text-4xl md:text-6xl text-white mt-4">{room.name}</h1>
-            <div className="w-20 h-0.5 bg-[#C9A96E] mt-4" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Interactive Photo Gallery */}
-      <section className="py-8 bg-white border-b border-gray-100">
+    <main>
+      {/* Hero Gallery */}
+      <section className="pt-28 md:pt-36 pb-12 bg-warm-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Primary Display */}
-            <div className="lg:col-span-2 relative aspect-[16/10] overflow-hidden rounded-sm bg-[#0A1628] shadow-md">
-              <Image
-                src={activeMainImage}
-                alt={room.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 66vw"
-                className="object-cover transition-all duration-500"
-              />
-            </div>
-            {/* Thumbnails */}
-            <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
-              {room.images.map((img, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setSelectedImage(img)}
-                  className={`relative aspect-[16/10] overflow-hidden rounded-sm border-2 transition-all group ${
-                    activeMainImage === img
-                      ? "border-[#C9A96E] shadow-lg shadow-[#C9A96E]/20"
-                      : "border-transparent opacity-70 hover:opacity-100"
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${room.name} view ${i + 1}`}
-                    fill
-                    sizes="(max-width: 1024px) 33vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </button>
-              ))}
-            </div>
+          {/* Breadcrumb */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
+            <Link href="/rooms" className="text-navy/40 text-sm hover:text-gold transition-colors flex items-center gap-2">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Rooms
+            </Link>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Image Gallery */}
+            <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeImage}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={room.images[activeImage]}
+                      alt={room.name}
+                      fill
+                      priority
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <div className="flex gap-2">
+                {room.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImage(i)}
+                    className={`relative aspect-[4/3] rounded-lg overflow-hidden flex-1 transition-all duration-300 ${
+                      i === activeImage ? "ring-2 ring-gold" : "opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <Image src={img} alt={`${room.name} ${i + 1}`} fill className="object-cover" sizes="15vw" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Room Info */}
+            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
+              <span className="text-[11px] tracking-[0.2em] uppercase text-gold font-medium">{room.category}</span>
+              <h1 className="font-playfair text-3xl md:text-4xl text-navy mt-2 mb-4">{room.name}</h1>
+              <div className="luxury-divider-left" />
+
+              {/* Price */}
+              <div className="flex items-baseline gap-3 my-6">
+                <span className="text-3xl font-playfair text-gold">₹{room.price.toLocaleString()}</span>
+                {room.originalPrice && (
+                  <span className="text-lg text-navy/30 line-through">₹{room.originalPrice.toLocaleString()}</span>
+                )}
+                <span className="text-navy/40 text-sm">per night</span>
+              </div>
+
+              {/* Room details grid */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Maximize className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] tracking-wider uppercase text-navy/40">Size</p>
+                    <p className="text-sm text-navy font-medium">{room.size}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <BedDouble className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] tracking-wider uppercase text-navy/40">Bed</p>
+                    <p className="text-sm text-navy font-medium">{room.bedType}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] tracking-wider uppercase text-navy/40">Guests</p>
+                    <p className="text-sm text-navy font-medium">Up to {room.maxOccupancy}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Eye className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] tracking-wider uppercase text-navy/40">View</p>
+                    <p className="text-sm text-navy font-medium">{room.view}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] tracking-wider uppercase text-navy/40">Floor</p>
+                    <p className="text-sm text-navy font-medium">{room.floor}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <Star className="w-4 h-4 text-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] tracking-wider uppercase text-navy/40">Rating</p>
+                    <p className="text-sm text-navy font-medium">4.6 ★</p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-charcoal/60 text-sm leading-relaxed mb-6">{room.description}</p>
+
+              {/* Book CTA */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/book" className="btn-gold rounded-full flex-1 text-center">
+                  Book This Room
+                </Link>
+                <a href="tel:+914428150001" className="btn-outline-gold rounded-full !border-navy/20 !text-navy hover:!bg-navy hover:!text-white hover:!border-navy flex-1 text-center">
+                  Call to Book
+                </a>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Room Details */}
-      <section className="py-16 md:py-24 bg-[#FAF7F2]">
+      {/* Amenities & Features */}
+      <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Left: Details */}
-            <div className="lg:col-span-2 space-y-12">
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-                <h2 className="font-[var(--font-playfair)] text-2xl text-[#0A1628] mb-4">About This Room</h2>
-                <div className="w-12 h-0.5 bg-[#C9A96E] mb-6" />
-                <p className="text-[#6B6B6B] leading-relaxed text-base">{room.description}</p>
-              </motion.div>
-
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
-                <h2 className="font-[var(--font-playfair)] text-2xl text-[#0A1628] mb-4">Features</h2>
-                <div className="w-12 h-0.5 bg-[#C9A96E] mb-6" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {room.features.map((feature) => (
-                    <div key={feature} className="flex items-center gap-3 py-2 bg-white px-4 border border-gray-100">
-                      <Check className="w-4 h-4 text-[#C9A96E] flex-shrink-0" />
-                      <span className="text-[#0A1628] text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
-                <h2 className="font-[var(--font-playfair)] text-2xl text-[#0A1628] mb-4">Amenities</h2>
-                <div className="w-12 h-0.5 bg-[#C9A96E] mb-6" />
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {room.amenities.map((amenity) => (
-                    <div key={amenity} className="flex items-center gap-3 bg-white px-4 py-3 border border-gray-100">
-                      <div className="w-2 h-2 bg-[#C9A96E] rounded-full flex-shrink-0" />
-                      <span className="text-[#0A1628] text-sm">{amenity}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Right: Booking Card */}
-            <div className="lg:col-span-1">
-              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="sticky top-28">
-                <div className="bg-white border border-gray-100 shadow-xl p-8 rounded-sm">
-                  <div className="text-center mb-6">
-                    {room.originalPrice && (
-                      <span className="text-[#9A9A9A] text-lg line-through block">{formatCurrency(room.originalPrice)}</span>
-                    )}
-                    <span className="font-[var(--font-playfair)] text-3xl text-[#C9A96E]">{formatCurrency(room.price)}</span>
-                    <span className="text-[#6B6B6B] text-sm"> / night</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <RevealOnScroll>
+              <h3 className="font-playfair text-2xl text-navy mb-6">Amenities</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {room.amenities.map((amenity) => (
+                  <div key={amenity} className="flex items-center gap-2.5 py-2">
+                    <Check className="w-4 h-4 text-gold flex-shrink-0" />
+                    <span className="text-sm text-navy/70">{amenity}</span>
                   </div>
-                  <div className="w-full h-px bg-gray-100 mb-6" />
-                  <div className="space-y-4 mb-6">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#6B6B6B] flex items-center gap-2"><Maximize className="w-4 h-4 text-[#C9A96E]" /> Size</span>
-                      <span className="text-[#0A1628] font-medium">{room.size}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#6B6B6B] flex items-center gap-2"><BedDouble className="w-4 h-4 text-[#C9A96E]" /> Bed</span>
-                      <span className="text-[#0A1628] font-medium">{room.bedType}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#6B6B6B] flex items-center gap-2"><Users className="w-4 h-4 text-[#C9A96E]" /> Occupancy</span>
-                      <span className="text-[#0A1628] font-medium">Up to {room.maxOccupancy}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#6B6B6B] flex items-center gap-2"><Eye className="w-4 h-4 text-[#C9A96E]" /> View</span>
-                      <span className="text-[#0A1628] font-medium">{room.view}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#6B6B6B] flex items-center gap-2"><Layers className="w-4 h-4 text-[#C9A96E]" /> Floor</span>
-                      <span className="text-[#0A1628] font-medium">{room.floor}</span>
-                    </div>
+                ))}
+              </div>
+            </RevealOnScroll>
+
+            <RevealOnScroll delay={0.15}>
+              <h3 className="font-playfair text-2xl text-navy mb-6">Room Features</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {room.features.map((feature) => (
+                  <div key={feature} className="flex items-center gap-2.5 py-2">
+                    <Check className="w-4 h-4 text-gold flex-shrink-0" />
+                    <span className="text-sm text-navy/70">{feature}</span>
                   </div>
-                  <Link href="/book" className="block w-full bg-gradient-to-r from-[#C9A96E] to-[#D4BC8E] text-[#0A1628] px-6 py-3.5 text-[11px] tracking-[0.2em] uppercase font-semibold text-center hover:shadow-lg hover:shadow-[#C9A96E]/30 transition-all">
-                    Book This Room
-                  </Link>
-                  <p className="text-center text-[#9A9A9A] text-xs mt-4">
-                    Best Rate Guarantee • Free Cancellation up to 48h
-                  </p>
-                </div>
-              </motion.div>
-            </div>
+                ))}
+              </div>
+            </RevealOnScroll>
           </div>
         </div>
       </section>
 
       {/* Similar Rooms */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-[var(--font-playfair)] text-2xl text-[#0A1628] mb-2 text-center">You May Also Like</h2>
-          <div className="w-12 h-0.5 bg-[#C9A96E] mx-auto mb-10" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {similarRooms.map((r) => (
-              <Link key={r.id} href={`/rooms/${r.slug}`} className="group block bg-white border border-gray-100 overflow-hidden hover:shadow-xl transition-all hover:border-[#C9A96E]/30 rounded-sm">
-                <div className="relative aspect-[16/9] bg-[#0A1628] overflow-hidden">
-                  <Image
-                    src={r.images[0]}
-                    alt={r.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute top-3 left-3 bg-[#C9A96E] text-[#0A1628] px-2.5 py-0.5 text-[10px] tracking-[0.2em] uppercase font-semibold">
-                    {r.category}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="font-[var(--font-playfair)] text-lg text-[#0A1628] group-hover:text-[#C9A96E] transition-colors">{r.name}</h3>
-                  <p className="text-[#6B6B6B] text-sm mt-1 line-clamp-1">{r.shortDescription}</p>
-                  <p className="text-[#C9A96E] mt-3 font-[var(--font-playfair)] text-lg">{formatCurrency(r.price)} <span className="text-[#6B6B6B] text-xs font-sans">/ night</span></p>
-                </div>
-              </Link>
-            ))}
+      {otherRooms.length > 0 && (
+        <section className="py-20 bg-warm-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <RevealOnScroll>
+              <div className="text-center mb-12">
+                <span className="section-subtitle">You May Also Like</span>
+                <h2 className="section-title">Other <span className="italic text-gold">Rooms</span></h2>
+              </div>
+            </RevealOnScroll>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {otherRooms.map((r, i) => (
+                <RevealOnScroll key={r.id} delay={i * 0.12}>
+                  <Link href={`/rooms/${r.slug}`} className="group block">
+                    <div className="card-luxury rounded-2xl overflow-hidden">
+                      <div className="relative aspect-[16/10] img-zoom">
+                        <Image src={r.images[0]} alt={r.name} fill className="object-cover" sizes="50vw" />
+                        <div className="absolute top-4 right-4 glass-dark rounded-full px-4 py-2">
+                          <span className="text-gold font-semibold">₹{r.price.toLocaleString()}</span>
+                          <span className="text-white/50 text-xs"> /night</span>
+                        </div>
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-lg font-playfair text-navy group-hover:text-gold transition-colors">{r.name}</h3>
+                        <p className="text-charcoal/50 text-sm mt-1">{r.shortDescription}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </RevealOnScroll>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-    </>
+        </section>
+      )}
+    </main>
   );
 }
-
