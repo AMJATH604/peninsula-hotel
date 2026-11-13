@@ -167,34 +167,35 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed inset-0 z-[45] bg-navy flex flex-col"
+            className="fixed inset-0 z-[70] bg-navy flex flex-col overflow-y-auto"
           >
             {/* Mobile Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                 <PeninsulaLogo height={40} className="bg-white/90 backdrop-blur-sm" />
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-2 text-white/60 hover:text-gold transition-colors"
+                aria-label="Close Navigation Menu"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             {/* Mobile Nav Links */}
-            <nav className="flex-1 flex flex-col justify-center px-8 -mt-10">
+            <nav className="flex-1 flex flex-col justify-center px-8 py-6 my-auto min-h-min">
               {navLinks.map((link, index) => (
                 <motion.div
                   key={link.name}
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + index * 0.06, duration: 0.4 }}
+                  transition={{ delay: 0.1 + index * 0.05, duration: 0.35 }}
                 >
                   <Link
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block py-4 text-white text-2xl font-playfair tracking-[0.1em] hover:text-gold transition-colors border-b border-white/5"
+                    className="block py-3 text-white text-xl sm:text-2xl font-playfair tracking-[0.08em] hover:text-gold transition-colors border-b border-white/5"
                   >
                     {link.name}
                   </Link>
@@ -203,8 +204,8 @@ export default function Header() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.4 }}
-                className="mt-8"
+                transition={{ delay: 0.6, duration: 0.35 }}
+                className="mt-6"
               >
                 <Link
                   href="/book"
@@ -220,14 +221,14 @@ export default function Header() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="px-8 pb-8 space-y-3"
+              transition={{ delay: 0.7 }}
+              className="px-8 pb-8 pt-4 space-y-3 flex-shrink-0 border-t border-white/10"
             >
               <a href="tel:+914428150001" className="flex items-center gap-2 text-gold/80 text-sm">
                 <Phone className="w-4 h-4" /> 044-2815 0001
               </a>
-              <a href="mailto:hotelpeninsulachennai@gmail.com" className="flex items-center gap-2 text-white/50 text-sm">
-                <Mail className="w-4 h-4" /> hotelpeninsulachennai@gmail.com
+              <a href="mailto:hotelpeninsulachennai@gmail.com" className="flex items-center gap-2 text-white/50 text-sm break-all">
+                <Mail className="w-4 h-4 flex-shrink-0" /> hotelpeninsulachennai@gmail.com
               </a>
             </motion.div>
           </motion.div>

@@ -250,7 +250,7 @@ function BookingPageContent() {
             Book Your Stay
           </h1>
           <p className="text-white/50 text-sm">
-            Complete your reservation at Peninsula Chennai — 5-Star Luxury on Marina Beach
+            Complete your reservation at Hotel Peninsula — T. Nagar, Chennai
           </p>
 
           {/* Steps */}

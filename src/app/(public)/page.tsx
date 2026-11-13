@@ -224,7 +224,7 @@ function HeroSection() {
             initial={{ opacity: 0, y: 50, clipPath: "inset(100% 0 0 0)" }}
             animate={{ opacity: 1, y: 0, clipPath: "inset(0% 0 0 0)" }}
             transition={{ duration: 1.2, delay: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="font-playfair text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[7rem] text-white font-extralight leading-none tracking-[0.04em]"
+            className="font-playfair text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[7rem] text-white font-extralight leading-none tracking-[0.04em]"
           >
             Hotel
           </motion.h1>
@@ -233,7 +233,7 @@ function HeroSection() {
             initial={{ opacity: 0, y: 60, clipPath: "inset(100% 0 0 0)" }}
             animate={{ opacity: 1, y: 0, clipPath: "inset(0% 0 0 0)" }}
             transition={{ duration: 1.2, delay: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="font-playfair text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[7rem] font-bold leading-none tracking-[0.06em] mt-1"
+            className="font-playfair text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[7rem] font-bold leading-none tracking-[0.06em] mt-1"
             style={{
               background: "linear-gradient(135deg, #C8A97E 0%, #F0E0C8 30%, #C8A97E 50%, #E8D5B5 70%, #C8A97E 100%)",
               backgroundSize: "200% 200%",
@@ -505,25 +505,25 @@ function AboutSection() {
                 excursions, our dedicated team ensures every stay feels like home.
               </p>
 
-              {/* Feature grid — 3 columns */}
-              <div className="grid grid-cols-3 gap-6 mb-10">
+              {/* Feature grid — responsive on mobile */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-10">
                 <div className="text-center p-4 rounded-2xl bg-cream/60">
                   <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
                     <MapPin className="w-4 h-4 text-gold" />
                   </div>
-                  <span className="text-xs text-navy/60 font-medium">Prime Location</span>
+                  <span className="text-xs text-navy/70 font-medium">Prime Location</span>
                 </div>
                 <div className="text-center p-4 rounded-2xl bg-cream/60">
                   <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
                     <Utensils className="w-4 h-4 text-gold" />
                   </div>
-                  <span className="text-xs text-navy/60 font-medium">South Indian Cuisine</span>
+                  <span className="text-xs text-navy/70 font-medium">South Indian Cuisine</span>
                 </div>
                 <div className="text-center p-4 rounded-2xl bg-cream/60">
                   <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
                     <Shield className="w-4 h-4 text-gold" />
                   </div>
-                  <span className="text-xs text-navy/60 font-medium">24/7 Security</span>
+                  <span className="text-xs text-navy/70 font-medium">24/7 Security</span>
                 </div>
               </div>
 
