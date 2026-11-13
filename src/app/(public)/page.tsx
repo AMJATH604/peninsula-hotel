@@ -269,7 +269,7 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 1.8 }}
           className="text-gold/60 text-[10px] sm:text-xs tracking-[0.3em] uppercase font-medium mb-12"
         >
-          in the heart of T. Nagar, Chennai
+          51, G. N. Chetty Road, T. Nagar, Chennai
         </motion.p>
 
         {/* CTA Buttons */}
@@ -495,10 +495,10 @@ function AboutSection() {
               </h2>
               <div className="luxury-divider-left" />
               <p className="text-charcoal/55 text-base leading-[1.9] mb-6">
-                Located at the heart of T. Nagar — Chennai&apos;s most vibrant neighbourhood — Hotel Peninsula 
+                Located on G. N. Chetty Road in T. Nagar, Hotel Peninsula 
                 has been welcoming guests with warmth and authentic South Indian hospitality since 2005. 
-                Just steps from Pondy Bazaar and Ranganathan Street, we offer the perfect blend of 
-                comfort, convenience, and genuine care.
+                Steps from Pondy Bazaar and Ranganathan Street, we offer the right balance of 
+                comfort, convenience, and attentive service.
               </p>
               <p className="text-charcoal/55 text-base leading-[1.9] mb-10">
                 Whether you&apos;re here for business meetings, family celebrations, temple visits, or shopping 
@@ -533,6 +533,76 @@ function AboutSection() {
             </RevealOnScroll>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== EDITORIAL STATEMENT (TASTE-SKILL WORD-HIGHLIGHT MOMENT) =====
+function WordSpan({
+  word,
+  progress,
+  range,
+  isAccent,
+}: {
+  word: string;
+  progress: any;
+  range: [number, number];
+  isAccent?: boolean;
+}) {
+  const opacity = useTransform(progress, range, [0.22, 1]);
+  const color = useTransform(
+    progress,
+    range,
+    [
+      "rgba(255, 255, 255, 0.22)",
+      isAccent ? "#C8A97E" : "rgba(255, 255, 255, 0.95)",
+    ]
+  );
+
+  return (
+    <motion.span style={{ color, opacity }} className="inline-block mr-[0.3em] transition-colors duration-150">
+      {word}
+    </motion.span>
+  );
+}
+
+function EditorialStatementSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 80%", "end 30%"],
+  });
+
+  const statement = "Twenty years of genuine hospitality on G. N. Chetty Road. Fifty-one comfortable rooms, traditional South Indian dining, and attentive care for every traveller.";
+  const words = statement.split(" ");
+
+  return (
+    <section ref={containerRef} className="py-24 md:py-32 bg-navy text-white overflow-hidden relative">
+      <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+        <span className="text-[10px] tracking-[0.4em] uppercase text-gold font-medium mb-6 block">
+          The Peninsula Standard
+        </span>
+        <h2 className="font-playfair text-2xl sm:text-3xl md:text-5xl font-light leading-[1.4] tracking-tight">
+          {words.map((word, i) => {
+            const start = i / words.length;
+            const end = (i + 1) / words.length;
+            const isAccent = word.toLowerCase().includes("hospitality") || word.toLowerCase().includes("attentive") || word.toLowerCase().includes("genuine");
+            return (
+              <WordSpan
+                key={i}
+                word={word}
+                progress={scrollYProgress}
+                range={[start, end]}
+                isAccent={isAccent}
+              />
+            );
+          })}
+        </h2>
+        <div className="w-16 h-[1px] bg-gold/40 mx-auto mt-10 mb-4" />
+        <p className="text-white/40 text-[10px] tracking-[0.3em] uppercase">
+          51, G. N. Chetty Road, T. Nagar, Chennai
+        </p>
       </div>
     </section>
   );
@@ -925,12 +995,12 @@ function LocationSection() {
           <RevealOnScroll direction="right" delay={0.2}>
             <span className="section-subtitle block">Location</span>
             <h2 className="section-title">
-              In the Heart of <span className="italic text-gold">Chennai</span>
+              Connected to <span className="italic text-gold">T. Nagar</span>
             </h2>
             <div className="luxury-divider-left" />
             <p className="text-charcoal/55 text-base leading-[1.9] mb-10">
-              Located on the prestigious G. N. Chetty Road in T. Nagar, Hotel Peninsula 
-              places you at the center of Chennai&apos;s most popular shopping and cultural district.
+              Situated on G. N. Chetty Road, Hotel Peninsula 
+              places you within walking distance of Pondy Bazaar, Panagal Park, and Chennai&apos;s primary retail district.
             </p>
 
             <div className="space-y-3 mb-10">
@@ -1014,6 +1084,7 @@ export default function HomePage() {
       <HeroSection />
       <QuickBooking />
       <AboutSection />
+      <EditorialStatementSection />
       <RoomsSection />
       <StatsSection />
       <MarqueeBanner />
